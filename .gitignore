@@ -1,24 +1,89 @@
-*.log
-.DS_Store
-.env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
+# Laravel & PHP
+/vendor/
+/.idea/
+/.vscode/
+/.phpunit.result.cache
+/.env
+/.env.*
+/.env.backup
+/.phpunit.result.cache
 /.phpunit.cache
-/.vscode
-/.zed
-/auth.json
-/node_modules
-/public/build
+
+# Composer
+composer.phar
+
+# Node
+/node_modules/
+/npm-debug.log*
+/yarn-debug.log*
+/yarn-error.log*
+
+# Vite / build / assets
 /public/hot
 /public/storage
-/storage/*.key
-/storage/pail
-/vendor
-Homestead.json
-Homestead.yaml
+/public/build/
+/dist/
+/build/
+/resources/js/.cache/
+/.cache/
+
+# OS files
+.DS_Store
 Thumbs.db
+
+# Logs and databases
+/storage/*.key
+/storage/debugbar
+/storage/logs/
+/storage/framework/cache/data/
+/storage/framework/sessions/
+/storage/framework/views/
+
+# IDE / Editor
+/.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Misc
+*.log
+coverage/
+node-repl_history
+.env.local
+.env.development
+.env.test
+
+# Docker
+docker-compose.override.yml
+
+# Others
+*.pem
+*.cert
+*.key
+.terraform/
+
+# Build outputs
+public/mix-manifest.json
+.mix-manifest.json
+
+# Mac
+.AppleDouble
+.LSOverride
+
+# Windows
+ehthumbs.db
+Icon\r
+
+# JetBrains
+.idea/
+
+# PHPUnit
+.phpunit.result.cache
+
+# Editor backups
+*~
+*.swp
+*.swo
+
+# optional: ignore provider caches
+bootstrap/cache/*.php
