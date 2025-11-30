@@ -13,8 +13,10 @@ function DetailInventaris() {
   const [editingItem, setEditingItem] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterPerangkat, setFilterPerangkat] = useState('all')
-  const [filterStatus, setFilterStatus] = useState('all')
+  const [filterKondisi, setFilterKondisi] = useState('all')
   const [activeMenuId, setActiveMenuId] = useState(null)
+  const [actionMode, setActionMode] = useState(null) // null | 'edit' | 'delete'
+  const [showActionsMenu, setShowActionsMenu] = useState(false)
   const [allItems, setAllItems] = useState([])
   const [formData, setFormData] = useState({
     nama: '',
@@ -24,7 +26,6 @@ function DetailInventaris() {
     lokasi: '',
     ip: '',
     kondisi: '',
-    status: 'aktif'
   })
   const [currentData, setCurrentData] = useState(null)
 
@@ -286,6 +287,33 @@ function DetailInventaris() {
     }
 
     // Hitung total, aktif, nonAktif dari items
+    // Normalize items to ensure fields: jenis, hostname, merk, ip, kondisi
+    const merkPool = [
+      'Hikvision DS-2',
+      'Dahua X-Series',
+      'Ubiquiti UniFi',
+      'Cisco Catalyst',
+      'MikroTik RouterBOARD',
+      'Dell PowerEdge',
+      'TP-Link Archer'
+    ]
+
+    const kondisiPool = ['Baik', 'Perlu Perbaikan', 'Rusak']
+
+    const normalize = (it) => {
+      const normalized = { ...it }
+      normalized.jenis = normalized.jenis || normalized.nama || 'Perangkat'
+      normalized.hostname = normalized.hostname || (
+        (normalized.nama || '').toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      )
+      normalized.merk = normalized.merk || merkPool[Math.abs((normalized.id || 0)) % merkPool.length]
+      normalized.ip = normalized.ip || `10.${id || '0'}.${normalized.id || '0'}`
+      normalized.kondisi = normalized.kondisi || kondisiPool[Math.abs((normalized.id || 0)) % kondisiPool.length]
+      return normalized
+    }
+
+    items = items.map(normalize)
+
     const total = items.length
     const aktif = items.filter(item => item.status === 'aktif').length
     const nonAktif = total - aktif
@@ -304,19 +332,20 @@ function DetailInventaris() {
 
   // Filter items berdasarkan search, perangkat, dan status
   const filteredItems = allItems.filter(item => {
-    const matchSearch = item.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              item.lokasi.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              (item.hostname || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-              (item.merk || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-              (item.ip || '').toLowerCase().includes(searchQuery.toLowerCase())
+    const q = searchQuery.toLowerCase()
+    const matchSearch = (item.nama || '').toString().toLowerCase().includes(q) ||
+          (item.lokasi || '').toString().toLowerCase().includes(q) ||
+          (item.hostname || '').toString().toLowerCase().includes(q) ||
+          (item.merk || '').toString().toLowerCase().includes(q) ||
+          (item.ip || '').toString().toLowerCase().includes(q)
     const matchPerangkat = filterPerangkat === 'all' || item.jenis === filterPerangkat
-    const matchStatus = filterStatus === 'all' || item.status === filterStatus
-    
-    return matchSearch && matchPerangkat && matchStatus
+    const matchKondisi = filterKondisi === 'all' || item.kondisi === filterKondisi
+
+    return matchSearch && matchPerangkat && matchKondisi
   })
 
   const handleAddItem = () => {
-    setFormData({ nama: '', lokasi: '', status: 'aktif' })
+    setFormData({ nama: '', jenis: '', hostname: '', merk: '', lokasi: '', ip: '', kondisi: 'Baik' })
     setEditingItem(null)
     setShowAddModal(true)
   }
@@ -349,7 +378,7 @@ function DetailInventaris() {
 
     setShowAddModal(false)
     setShowEditModal(false)
-    setFormData({ nama: '', lokasi: '', status: 'aktif' })
+    setFormData({ nama: '', jenis: '', hostname: '', merk: '', lokasi: '', ip: '', kondisi: 'Baik' })
   }
 
   const handleDeleteItem = (itemId) => {
@@ -428,7 +457,7 @@ function DetailInventaris() {
               </svg>
             </div>
             <div className="Detail-stat-info">
-              <p className="Detail-stat-label">Aktif</p>
+              <p className="Detail-stat-label">SO (Siap Operasi))</p>
               <p className="Detail-stat-value">{currentData.aktif}</p>
             </div>
           </div>
@@ -441,7 +470,7 @@ function DetailInventaris() {
               </svg>
             </div>
             <div className="Detail-stat-info">
-              <p className="Detail-stat-label">Non-Aktif</p>
+              <p className="Detail-stat-label">TSO (Tidak Siap Operasi)</p>
               <p className="Detail-stat-value">{currentData.nonAktif}</p>
             </div>
           </div>
@@ -451,18 +480,34 @@ function DetailInventaris() {
         <div className="Detail-list-section">
           <div className="list-header">
             <h2 className="list-title">Daftar Item</h2>
-            <Button 
-              variant="success" 
-              size="medium"
-              onClick={handleAddItem}
-              icon={
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              }
-            >
-              Tambah
-            </Button>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <Button 
+                variant="success" 
+                size="medium"
+                onClick={handleAddItem}
+                icon={
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                }
+              >
+                Tambah
+              </Button>
+
+              <div className="actions-dropdown-wrapper" style={{ position: 'relative' }}>
+                <button className="actions-dropdown-btn" onClick={() => setShowActionsMenu(!showActionsMenu)} style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'white' }}>
+                  ⋯
+                </button>
+                {showActionsMenu && (
+                  <div className="actions-dropdown" style={{ position: 'absolute', right: 0, marginTop: 6, background: 'white', border: '1px solid var(--border-light)', borderRadius: 8, padding: 8, zIndex: 40 }}>
+                    <button className="dropdown-action" onClick={() => { setActionMode(null); setShowActionsMenu(false); alert('Klik "Tambah" untuk menambah item seperti biasa.') }}>Tambah</button>
+                    <button className="dropdown-action" onClick={() => { setActionMode('edit'); setShowActionsMenu(false); alert('Mode EDIT aktif: klik baris untuk mengedit item.') }}>Mode Edit (klik baris)</button>
+                    <button className="dropdown-action" onClick={() => { setActionMode('delete'); setShowActionsMenu(false); alert('Mode HAPUS aktif: klik baris untuk menghapus item.') }}>Mode Hapus (klik baris)</button>
+                    <button className="dropdown-action" onClick={() => { setActionMode(null); setShowActionsMenu(false) }}>Batal Mode</button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Filter Controls */}
@@ -500,15 +545,16 @@ function DetailInventaris() {
             )}
             
             <div className="filter-group">
-              <label className="filter-label">Status</label>
+              <label className="filter-label">Kondisi</label>
               <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                value={filterKondisi}
+                onChange={(e) => setFilterKondisi(e.target.value)}
                 className="filter-select"
               >
-                <option value="all">Semua Status</option>
-                <option value="aktif">SO (Siap Operasi)</option>
-                <option value="tidak_aktif">TSO (Tidak Siap Operasi)</option>
+                <option value="all">Semua Kondisi</option>
+                <option value="Baik">Baik</option>
+                <option value="Perlu Perbaikan">Perlu Perbaikan</option>
+                <option value="Rusak">Rusak</option>
               </select>
             </div>
           </div>
@@ -524,103 +570,27 @@ function DetailInventaris() {
                   <th>Lokasi</th>
                   <th>IP Perangkat</th>
                   <th>Kondisi</th>
-                  <th>Status</th>
-                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredItems.length > 0 ? (
                   filteredItems.map(item => (
-                    <tr key={item.id}>
-                      <td className="jenis-cell">{item.jenis || '-'}</td>
-                      <td className="hostname-cell">{item.hostname || item.nama || '-'}</td>
-                      <td className="merk-cell">{item.merk || '-'}</td>
-                      <td className="lokasi-cell">{item.lokasi}</td>
-                      <td className="ip-cell">{item.ip || '-'}</td>
-                      <td className="kondisi-cell">{item.kondisi || '-'}</td>
-                      <td className="status-cell">
-                        <Badge 
-                          variant={item.status === 'aktif' ? 'success' : 'danger'}
-                          dot
-                          title={item.status === 'aktif' ? 'SO: Siap Operasi' : 'TSO: Tidak Siap Operasi'}
-                        >
-                          {item.status === 'aktif' ? 'SO' : 'TSO'}
-                        </Badge>
-                      </td>
-                      <td className="aksi-cell">
-                        {/* Desktop: 2 buttons */}
-                        <div className="action-buttons-desktop">
-                          <Button
-                            variant="secondary"
-                            size="small"
-                            onClick={() => handleEditItem(item)}
-                            icon={
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 20h9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                              </svg>
-                            }
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="danger"
-                            size="small"
-                            onClick={() => handleDeleteItem(item.id)}
-                            icon={
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                              </svg>
-                            }
-                          >
-                            Hapus
-                          </Button>
-                        </div>
-
-                        {/* Mobile: 1 button with dropdown */}
-                        <div className="action-menu-wrapper">
-                          <button 
-                            className="action-menu-btn"
-                            onClick={() => setActiveMenuId(activeMenuId === item.id ? null : item.id)}
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                            <span>Edit</span>
-                          </button>
-                          
-                          {activeMenuId === item.id && (
-                            <div className="action-dropdown">
-                              <button 
-                                className="dropdown-item edit-item"
-                                onClick={() => {
-                                  handleEditItem(item)
-                                  setActiveMenuId(null)
-                                }}
-                              >
-                                Edit
-                              </button>
-                              <button 
-                                className="dropdown-item delete-item"
-                                onClick={() => {
-                                  handleDeleteItem(item.id)
-                                  setActiveMenuId(null)
-                                }}
-                              >
-                                Hapus
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
+                    <tr key={item.id} onClick={() => {
+                        if (actionMode === 'edit') { handleEditItem(item); setActionMode(null) }
+                        else if (actionMode === 'delete') { handleDeleteItem(item.id); setActionMode(null) }
+                      }} style={{ cursor: actionMode ? 'pointer' : 'default' }}>
+                        <td className="jenis-cell">{item.jenis || '-'}</td>
+                        <td className="hostname-cell">{item.hostname || item.nama || '-'}</td>
+                        <td className="merk-cell">{item.merk || '-'}</td>
+                        <td className="lokasi-cell">{item.lokasi}</td>
+                        <td className="ip-cell">{item.ip || '-'}</td>
+                        <td className="kondisi-cell">{item.kondisi || '-'}</td>
+                      </tr>
                   ))
                 ) : (
-                  <tr>
-                      <td colSpan="8" className="empty-state">Tidak ada data</td>
-                  </tr>
+                    <tr>
+                      <td colSpan="6" className="empty-state">Tidak ada data</td>
+                    </tr>
                 )}
               </tbody>
             </table>
@@ -657,7 +627,7 @@ function DetailInventaris() {
           </>
         }
       >
-        <div className="modal-body">
+          <div className="modal-body">
           <Input
             label="Jenis Perangkat"
             placeholder="Masukkan jenis perangkat"
@@ -700,25 +670,7 @@ function DetailInventaris() {
             onChange={(e) => setFormData({ ...formData, kondisi: e.target.value })}
           />
 
-          <div className="form-group">
-            <label>Status</label>
-            <select
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              className="form-select"
-              style={{ 
-                width: '100%', 
-                padding: '10px 12px', 
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: '14px',
-                marginTop: '4px'
-              }}
-            >
-              <option value="aktif">SO (Siap Operasi)</option>
-              <option value="tidak_aktif">TSO (Tidak Siap Operasi)</option>
-            </select>
-          </div>
+          {/* Kondisi is already an input above; we kept it as free text but could switch to select if needed. */}
         </div>
       </Modal>
 
