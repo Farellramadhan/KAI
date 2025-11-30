@@ -180,7 +180,6 @@ function DetailAset() {
         </button>
         <h1>{data.name}</h1>
         <div className="legend" style={{marginTop: '6px'}}>
-          <small>TSO: Tidak Siap Operasi · SO: Siap Operasi</small>
         </div>
       </div>
 
@@ -216,7 +215,7 @@ function DetailAset() {
                 </svg>
               </div>
               <div className="stat-info">
-                <div className="stat-label" title="TSO: Tidak Siap Operasi">TSO</div>
+                <div className="stat-label">SO (Siap Operasi)</div>
                 <div className="stat-value">{data.aktif}</div>
               </div>
             </div>
@@ -229,7 +228,7 @@ function DetailAset() {
                 </svg>
               </div>
               <div className="stat-info">
-                <div className="stat-label" title="SO: Siap Operasi">SO</div>
+                <div className="stat-label">TSO (Tidak Siap Operasi)</div>
                 <div className="stat-value">{data.nonAktif}</div>
               </div>
             </div>
@@ -284,17 +283,17 @@ function DetailAset() {
 
             <div className="popup-detail-grid">
             <div className="popup-detail-item">
-              <div className="detail-label" title="TSO: Tidak Siap Operasi">TSO</div>
+              <div className="detail-label" title="SO: Siap Operasi">SO</div>
               <Badge variant="success" size="large">{selectedPerangkat.aktif}</Badge>
             </div>
             <div className="popup-detail-item">
-              <div className="detail-label" title="SO: Siap Operasi">SO</div>
+              <div className="detail-label" title="TSO: Tidak Siap Operasi">TSO</div>
               <Badge variant="danger" size="large">{selectedPerangkat.tidakAktif}</Badge>
             </div>
             </div>
 
             <div className="popup-detail-item">
-              <div className="detail-label">Persentase TSO</div>
+              <div className="detail-label">Persentase SO</div>
               <div className="progress-bar" style={{
                 width: '100%',
                 height: '12px',
@@ -320,7 +319,7 @@ function DetailAset() {
                 fontWeight: '500',
                 color: 'var(--text-secondary)'
               }}>
-                {Math.round((selectedPerangkat.aktif / (selectedPerangkat.aktif + selectedPerangkat.tidakAktif)) * 100)}% TSO
+                {Math.round((selectedPerangkat.aktif / (selectedPerangkat.aktif + selectedPerangkat.tidakAktif)) * 100)}% SO
               </div>
             </div>
           </div>
