@@ -25,26 +25,26 @@ function DetailInventaris() {
     merk: '',
     lokasi: '',
     ip: '',
-    kondisi: '',
-  })
-  const [currentData, setCurrentData] = useState(null)
-
-  // Data Detail per perangkat (struktur: '1-1' = lokasi 1, perangkat 1)
-  const DetailData = {
-    '1-1': { // Stasiun Lempuyangan - CCTV IP Camera
-      perangkatNama: 'CCTV IP Camera',
-      lokasiNama: 'Stasiun Lempuyangan',
-      total: 20,
-      aktif: 18,
-      nonAktif: 2,
-      items: [
-        { id: 1, nama: 'CCTV_01', hostname: 'cctv-01', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Utara 1', ip: '10.1.1.11', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 2, nama: 'CCTV_02', hostname: 'cctv-02', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Utara 2', ip: '10.1.1.12', status: 'tidak_aktif', kondisi: 'Rusak', jenis: 'CCTV IP Camera' },
-        { id: 3, nama: 'CCTV_03', hostname: 'cctv-03', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Barat', ip: '10.1.1.13', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 4, nama: 'CCTV_04', hostname: 'cctv-04', merk: 'Hikvision DS-2', lokasi: 'Peron 1', ip: '10.1.1.14', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 5, nama: 'CCTV_05', hostname: 'cctv-05', merk: 'Hikvision DS-2', lokasi: 'Peron 2', ip: '10.1.1.15', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 6, nama: 'CCTV_06', hostname: 'cctv-06', merk: 'Hikvision DS-2', lokasi: 'Peron 3', ip: '10.1.1.16', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 7, nama: 'CCTV_07', hostname: 'cctv-07', merk: 'Hikvision DS-2', lokasi: 'Ruang Tunggu', ip: '10.1.1.17', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+          <div className="form-group">
+            <label>Kondisi</label>
+            <select
+              value={formData.kondisi}
+              onChange={(e) => setFormData({ ...formData, kondisi: e.target.value })}
+              className="form-select"
+              style={{ 
+                width: '100%', 
+                padding: '10px 12px', 
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '14px',
+                marginTop: '4px'
+              }}
+            >
+              <option value="Baik">Baik</option>
+              <option value="Perlu Perbaikan">Perlu Perbaikan</option>
+              <option value="Rusak">Rusak</option>
+            </select>
+          </div>
         { id: 8, nama: 'CCTV_08', hostname: 'cctv-08', merk: 'Hikvision DS-2', lokasi: 'Loket Tiket', ip: '10.1.1.18', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
         { id: 9, nama: 'CCTV_09', hostname: 'cctv-09', merk: 'Hikvision DS-2', lokasi: 'Area Kantor', ip: '10.1.1.19', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
         { id: 10, nama: 'CCTV_10', hostname: 'cctv-10', merk: 'Hikvision DS-2', lokasi: 'Koridor Utama', ip: '10.1.1.20', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
@@ -500,13 +500,18 @@ function DetailInventaris() {
                 </button>
                 {showActionsMenu && (
                   <div className="actions-dropdown" style={{ position: 'absolute', right: 0, marginTop: 6, background: 'white', border: '1px solid var(--border-light)', borderRadius: 8, padding: 8, zIndex: 40 }}>
-                    <button className="dropdown-action" onClick={() => { setActionMode(null); setShowActionsMenu(false); alert('Klik "Tambah" untuk menambah item seperti biasa.') }}>Tambah</button>
-                    <button className="dropdown-action" onClick={() => { setActionMode('edit'); setShowActionsMenu(false); alert('Mode EDIT aktif: klik baris untuk mengedit item.') }}>Mode Edit (klik baris)</button>
-                    <button className="dropdown-action" onClick={() => { setActionMode('delete'); setShowActionsMenu(false); alert('Mode HAPUS aktif: klik baris untuk menghapus item.') }}>Mode Hapus (klik baris)</button>
-                    <button className="dropdown-action" onClick={() => { setActionMode(null); setShowActionsMenu(false) }}>Batal Mode</button>
+                    <button className="dropdown-action" onClick={() => { setActionMode(null); setShowActionsMenu(false); }}>Tambah (default)</button>
+                    <button className="dropdown-action" onClick={() => { setActionMode('edit'); setShowActionsMenu(false); }}>Mode Edit (klik baris)</button>
+                    <button className="dropdown-action" onClick={() => { setActionMode('delete'); setShowActionsMenu(false); }}>Mode Hapus (klik baris)</button>
+                    <button className="dropdown-action" onClick={() => { setActionMode(null); setShowActionsMenu(false); }}>Batal Mode</button>
                   </div>
                 )}
               </div>
+              {actionMode && (
+                <div style={{ marginLeft: 8, padding: '6px 10px', borderRadius: 8, background: 'var(--gray-50)', border: '1px solid var(--border-light)', fontSize: 13 }}>
+                  Mode: {actionMode === 'edit' ? 'Edit' : actionMode === 'delete' ? 'Hapus' : 'Normal'}
+                </div>
+              )}
             </div>
           </div>
 
