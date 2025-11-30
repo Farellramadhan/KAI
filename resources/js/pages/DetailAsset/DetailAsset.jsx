@@ -18,7 +18,12 @@ function DetailInventaris() {
   const [allItems, setAllItems] = useState([])
   const [formData, setFormData] = useState({
     nama: '',
+    jenis: '',
+    hostname: '',
+    merk: '',
     lokasi: '',
+    ip: '',
+    kondisi: '',
     status: 'aktif'
   })
   const [currentData, setCurrentData] = useState(null)
@@ -32,26 +37,26 @@ function DetailInventaris() {
       aktif: 18,
       nonAktif: 2,
       items: [
-        { id: 1, nama: 'CCTV_01', lokasi: 'Pintu Masuk Utara 1', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 2, nama: 'CCTV_02', lokasi: 'Pintu Masuk Utara 2', status: 'tidak_aktif', jenis: 'CCTV IP Camera' },
-        { id: 3, nama: 'CCTV_03', lokasi: 'Pintu Masuk Barat', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 4, nama: 'CCTV_04', lokasi: 'Peron 1', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 5, nama: 'CCTV_05', lokasi: 'Peron 2', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 6, nama: 'CCTV_06', lokasi: 'Peron 3', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 7, nama: 'CCTV_07', lokasi: 'Ruang Tunggu', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 8, nama: 'CCTV_08', lokasi: 'Loket Tiket', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 9, nama: 'CCTV_09', lokasi: 'Area Kantor', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 10, nama: 'CCTV_10', lokasi: 'Koridor Utama', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 11, nama: 'CCTV_11', lokasi: 'Tangga Darurat 1', status: 'tidak_aktif', jenis: 'CCTV IP Camera' },
-        { id: 12, nama: 'CCTV_12', lokasi: 'Tangga Darurat 2', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 13, nama: 'CCTV_13', lokasi: 'Area Parkir', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 14, nama: 'CCTV_14', lokasi: 'Pintu Keluar', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 15, nama: 'CCTV_15', lokasi: 'Basement', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 16, nama: 'CCTV_16', lokasi: 'Ruang Mesin', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 17, nama: 'CCTV_17', lokasi: 'Area Outdoor 1', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 18, nama: 'CCTV_18', lokasi: 'Area Outdoor 2', status: 'aktif', jenis: 'CCTV IP Camera' },
-        { id: 19, nama: 'CCTV_19', lokasi: 'Peron 4', status: 'tidak_aktif', jenis: 'CCTV IP Camera' },
-        { id: 20, nama: 'CCTV_20', lokasi: 'Peron 5', status: 'aktif', jenis: 'CCTV IP Camera' }
+        { id: 1, nama: 'CCTV_01', hostname: 'cctv-01', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Utara 1', ip: '10.1.1.11', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 2, nama: 'CCTV_02', hostname: 'cctv-02', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Utara 2', ip: '10.1.1.12', status: 'tidak_aktif', kondisi: 'Rusak', jenis: 'CCTV IP Camera' },
+        { id: 3, nama: 'CCTV_03', hostname: 'cctv-03', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Barat', ip: '10.1.1.13', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 4, nama: 'CCTV_04', hostname: 'cctv-04', merk: 'Hikvision DS-2', lokasi: 'Peron 1', ip: '10.1.1.14', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 5, nama: 'CCTV_05', hostname: 'cctv-05', merk: 'Hikvision DS-2', lokasi: 'Peron 2', ip: '10.1.1.15', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 6, nama: 'CCTV_06', hostname: 'cctv-06', merk: 'Hikvision DS-2', lokasi: 'Peron 3', ip: '10.1.1.16', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 7, nama: 'CCTV_07', hostname: 'cctv-07', merk: 'Hikvision DS-2', lokasi: 'Ruang Tunggu', ip: '10.1.1.17', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 8, nama: 'CCTV_08', hostname: 'cctv-08', merk: 'Hikvision DS-2', lokasi: 'Loket Tiket', ip: '10.1.1.18', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 9, nama: 'CCTV_09', hostname: 'cctv-09', merk: 'Hikvision DS-2', lokasi: 'Area Kantor', ip: '10.1.1.19', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 10, nama: 'CCTV_10', hostname: 'cctv-10', merk: 'Hikvision DS-2', lokasi: 'Koridor Utama', ip: '10.1.1.20', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 11, nama: 'CCTV_11', hostname: 'cctv-11', merk: 'Hikvision DS-2', lokasi: 'Tangga Darurat 1', ip: '10.1.1.21', status: 'tidak_aktif', kondisi: 'Perlu Perbaikan', jenis: 'CCTV IP Camera' },
+        { id: 12, nama: 'CCTV_12', hostname: 'cctv-12', merk: 'Hikvision DS-2', lokasi: 'Tangga Darurat 2', ip: '10.1.1.22', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 13, nama: 'CCTV_13', hostname: 'cctv-13', merk: 'Hikvision DS-2', lokasi: 'Area Parkir', ip: '10.1.1.23', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 14, nama: 'CCTV_14', hostname: 'cctv-14', merk: 'Hikvision DS-2', lokasi: 'Pintu Keluar', ip: '10.1.1.24', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 15, nama: 'CCTV_15', hostname: 'cctv-15', merk: 'Hikvision DS-2', lokasi: 'Basement', ip: '10.1.1.25', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 16, nama: 'CCTV_16', hostname: 'cctv-16', merk: 'Hikvision DS-2', lokasi: 'Ruang Mesin', ip: '10.1.1.26', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 17, nama: 'CCTV_17', hostname: 'cctv-17', merk: 'Hikvision DS-2', lokasi: 'Area Outdoor 1', ip: '10.1.1.27', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 18, nama: 'CCTV_18', hostname: 'cctv-18', merk: 'Hikvision DS-2', lokasi: 'Area Outdoor 2', ip: '10.1.1.28', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
+        { id: 19, nama: 'CCTV_19', hostname: 'cctv-19', merk: 'Hikvision DS-2', lokasi: 'Peron 4', ip: '10.1.1.29', status: 'tidak_aktif', kondisi: 'Perlu Perbaikan', jenis: 'CCTV IP Camera' },
+        { id: 20, nama: 'CCTV_20', hostname: 'cctv-20', merk: 'Hikvision DS-2', lokasi: 'Peron 5', ip: '10.1.1.30', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' }
       ]
     },
 
@@ -300,7 +305,10 @@ function DetailInventaris() {
   // Filter items berdasarkan search, perangkat, dan status
   const filteredItems = allItems.filter(item => {
     const matchSearch = item.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        item.lokasi.toLowerCase().includes(searchQuery.toLowerCase())
+              item.lokasi.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              (item.hostname || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+              (item.merk || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+              (item.ip || '').toLowerCase().includes(searchQuery.toLowerCase())
     const matchPerangkat = filterPerangkat === 'all' || item.jenis === filterPerangkat
     const matchStatus = filterStatus === 'all' || item.status === filterStatus
     
@@ -320,8 +328,8 @@ function DetailInventaris() {
   }
 
   const handleSaveItem = () => {
-    if (!formData.nama || !formData.lokasi) {
-      alert('Semua field harus diisi!')
+    if (!formData.jenis || !formData.hostname || !formData.lokasi) {
+      alert('Field Jenis, Hostname, dan Lokasi harus diisi!')
       return
     }
 
@@ -499,8 +507,8 @@ function DetailInventaris() {
                 className="filter-select"
               >
                 <option value="all">Semua Status</option>
-                <option value="aktif">Aktif</option>
-                <option value="tidak_aktif">Tidak Aktif</option>
+                <option value="aktif">SO (Siap Operasi)</option>
+                <option value="tidak_aktif">TSO (Tidak Siap Operasi)</option>
               </select>
             </div>
           </div>
@@ -510,8 +518,12 @@ function DetailInventaris() {
             <table className="Detail-table">
               <thead>
                 <tr>
-                  <th>Nama Perangkat</th>
+                  <th>Jenis Perangkat</th>
+                  <th>Hostname</th>
+                  <th>Merk / Spek</th>
                   <th>Lokasi</th>
+                  <th>IP Perangkat</th>
+                  <th>Kondisi</th>
                   <th>Status</th>
                   <th>Aksi</th>
                 </tr>
@@ -520,14 +532,19 @@ function DetailInventaris() {
                 {filteredItems.length > 0 ? (
                   filteredItems.map(item => (
                     <tr key={item.id}>
-                      <td className="nama-cell">{item.nama}</td>
+                      <td className="jenis-cell">{item.jenis || '-'}</td>
+                      <td className="hostname-cell">{item.hostname || item.nama || '-'}</td>
+                      <td className="merk-cell">{item.merk || '-'}</td>
                       <td className="lokasi-cell">{item.lokasi}</td>
+                      <td className="ip-cell">{item.ip || '-'}</td>
+                      <td className="kondisi-cell">{item.kondisi || '-'}</td>
                       <td className="status-cell">
                         <Badge 
                           variant={item.status === 'aktif' ? 'success' : 'danger'}
                           dot
+                          title={item.status === 'aktif' ? 'SO: Siap Operasi' : 'TSO: Tidak Siap Operasi'}
                         >
-                          {item.status === 'aktif' ? 'Aktif' : 'Tidak Aktif'}
+                          {item.status === 'aktif' ? 'SO' : 'TSO'}
                         </Badge>
                       </td>
                       <td className="aksi-cell">
@@ -602,7 +619,7 @@ function DetailInventaris() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="empty-state">Tidak ada data</td>
+                      <td colSpan="8" className="empty-state">Tidak ada data</td>
                   </tr>
                 )}
               </tbody>
@@ -642,13 +659,6 @@ function DetailInventaris() {
       >
         <div className="modal-body">
           <Input
-            label="Nama Perangkat"
-            placeholder="Masukkan nama perangkat"
-            value={formData.nama}
-            onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-          />
-
-          <Input
             label="Jenis Perangkat"
             placeholder="Masukkan jenis perangkat"
             value={formData.jenis}
@@ -656,10 +666,38 @@ function DetailInventaris() {
           />
 
           <Input
+            label="Hostname"
+            placeholder="Masukkan hostname"
+            value={formData.hostname}
+            onChange={(e) => setFormData({ ...formData, hostname: e.target.value })}
+          />
+
+          <Input
+            label="Merk / Spek"
+            placeholder="Masukkan merk atau spesifikasi"
+            value={formData.merk}
+            onChange={(e) => setFormData({ ...formData, merk: e.target.value })}
+          />
+
+          <Input
             label="Lokasi"
             placeholder="Masukkan lokasi"
             value={formData.lokasi}
             onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
+          />
+
+          <Input
+            label="IP Perangkat"
+            placeholder="Masukkan IP perangkat"
+            value={formData.ip}
+            onChange={(e) => setFormData({ ...formData, ip: e.target.value })}
+          />
+
+          <Input
+            label="Kondisi"
+            placeholder="Masukkan kondisi (mis. Baik, Rusak...)"
+            value={formData.kondisi}
+            onChange={(e) => setFormData({ ...formData, kondisi: e.target.value })}
           />
 
           <div className="form-group">
@@ -677,8 +715,8 @@ function DetailInventaris() {
                 marginTop: '4px'
               }}
             >
-              <option value="aktif">Aktif</option>
-              <option value="tidak_aktif">Tidak Aktif</option>
+              <option value="aktif">SO (Siap Operasi)</option>
+              <option value="tidak_aktif">TSO (Tidak Siap Operasi)</option>
             </select>
           </div>
         </div>
