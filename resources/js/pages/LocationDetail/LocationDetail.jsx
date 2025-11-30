@@ -213,7 +213,7 @@ function DetailAset() {
                 </svg>
               </div>
               <div className="stat-info">
-                <div className="stat-label">Aktif</div>
+                <div className="stat-label">TSO</div>
                 <div className="stat-value">{data.aktif}</div>
               </div>
             </div>
@@ -226,7 +226,7 @@ function DetailAset() {
                 </svg>
               </div>
               <div className="stat-info">
-                <div className="stat-label">Non-Aktif</div>
+                <div className="stat-label">SO</div>
                 <div className="stat-value">{data.nonAktif}</div>
               </div>
             </div>
@@ -281,17 +281,17 @@ function DetailAset() {
 
             <div className="popup-detail-grid">
               <div className="popup-detail-item">
-                <div className="detail-label">Aktif</div>
+                <div className="detail-label">TSO</div>
                 <Badge variant="success" size="large">{selectedPerangkat.aktif}</Badge>
               </div>
               <div className="popup-detail-item">
-                <div className="detail-label">Tidak Aktif</div>
+                <div className="detail-label">SO</div>
                 <Badge variant="danger" size="large">{selectedPerangkat.tidakAktif}</Badge>
               </div>
             </div>
 
             <div className="popup-detail-item">
-              <div className="detail-label">Persentase Aktif</div>
+              <div className="detail-label">Persentase TSO</div>
               <div className="progress-bar" style={{
                 width: '100%',
                 height: '12px',
@@ -317,7 +317,7 @@ function DetailAset() {
                 fontWeight: '500',
                 color: 'var(--text-secondary)'
               }}>
-                {Math.round((selectedPerangkat.aktif / (selectedPerangkat.aktif + selectedPerangkat.tidakAktif)) * 100)}% aktif
+                {Math.round((selectedPerangkat.aktif / (selectedPerangkat.aktif + selectedPerangkat.tidakAktif)) * 100)}% TSO
               </div>
             </div>
           </div>
