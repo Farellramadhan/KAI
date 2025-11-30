@@ -179,6 +179,9 @@ function DetailAset() {
           </svg>
         </button>
         <h1>{data.name}</h1>
+        <div className="legend" style={{marginTop: '6px'}}>
+          <small>TSO: Tidak Siap Operasi · SO: Siap Operasi</small>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -213,7 +216,7 @@ function DetailAset() {
                 </svg>
               </div>
               <div className="stat-info">
-                <div className="stat-label">TSO</div>
+                <div className="stat-label" title="TSO: Tidak Siap Operasi">TSO</div>
                 <div className="stat-value">{data.aktif}</div>
               </div>
             </div>
@@ -226,7 +229,7 @@ function DetailAset() {
                 </svg>
               </div>
               <div className="stat-info">
-                <div className="stat-label">SO</div>
+                <div className="stat-label" title="SO: Siap Operasi">SO</div>
                 <div className="stat-value">{data.nonAktif}</div>
               </div>
             </div>
@@ -280,14 +283,14 @@ function DetailAset() {
             </div>
 
             <div className="popup-detail-grid">
-              <div className="popup-detail-item">
-                <div className="detail-label">TSO</div>
-                <Badge variant="success" size="large">{selectedPerangkat.aktif}</Badge>
-              </div>
-              <div className="popup-detail-item">
-                <div className="detail-label">SO</div>
-                <Badge variant="danger" size="large">{selectedPerangkat.tidakAktif}</Badge>
-              </div>
+            <div className="popup-detail-item">
+              <div className="detail-label" title="TSO: Tidak Siap Operasi">TSO</div>
+              <Badge variant="success" size="large">{selectedPerangkat.aktif}</Badge>
+            </div>
+            <div className="popup-detail-item">
+              <div className="detail-label" title="SO: Siap Operasi">SO</div>
+              <Badge variant="danger" size="large">{selectedPerangkat.tidakAktif}</Badge>
+            </div>
             </div>
 
             <div className="popup-detail-item">
