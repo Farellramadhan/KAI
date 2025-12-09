@@ -25,39 +25,39 @@ function DetailInventaris() {
     merk: '',
     lokasi: '',
     ip: '',
-          <div className="form-group">
-            <label>Kondisi</label>
-            <select
-              value={formData.kondisi}
-              onChange={(e) => setFormData({ ...formData, kondisi: e.target.value })}
-              className="form-select"
-              style={{ 
-                width: '100%', 
-                padding: '10px 12px', 
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: '14px',
-                marginTop: '4px'
-              }}
-            >
-              <option value="Baik">Baik</option>
-              <option value="Perlu Perbaikan">Perlu Perbaikan</option>
-              <option value="Rusak">Rusak</option>
-            </select>
-          </div>
-        { id: 8, nama: 'CCTV_08', hostname: 'cctv-08', merk: 'Hikvision DS-2', lokasi: 'Loket Tiket', ip: '10.1.1.18', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 9, nama: 'CCTV_09', hostname: 'cctv-09', merk: 'Hikvision DS-2', lokasi: 'Area Kantor', ip: '10.1.1.19', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 10, nama: 'CCTV_10', hostname: 'cctv-10', merk: 'Hikvision DS-2', lokasi: 'Koridor Utama', ip: '10.1.1.20', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 11, nama: 'CCTV_11', hostname: 'cctv-11', merk: 'Hikvision DS-2', lokasi: 'Tangga Darurat 1', ip: '10.1.1.21', status: 'tidak_aktif', kondisi: 'Perlu Perbaikan', jenis: 'CCTV IP Camera' },
-        { id: 12, nama: 'CCTV_12', hostname: 'cctv-12', merk: 'Hikvision DS-2', lokasi: 'Tangga Darurat 2', ip: '10.1.1.22', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 13, nama: 'CCTV_13', hostname: 'cctv-13', merk: 'Hikvision DS-2', lokasi: 'Area Parkir', ip: '10.1.1.23', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 14, nama: 'CCTV_14', hostname: 'cctv-14', merk: 'Hikvision DS-2', lokasi: 'Pintu Keluar', ip: '10.1.1.24', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 15, nama: 'CCTV_15', hostname: 'cctv-15', merk: 'Hikvision DS-2', lokasi: 'Basement', ip: '10.1.1.25', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 16, nama: 'CCTV_16', hostname: 'cctv-16', merk: 'Hikvision DS-2', lokasi: 'Ruang Mesin', ip: '10.1.1.26', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 17, nama: 'CCTV_17', hostname: 'cctv-17', merk: 'Hikvision DS-2', lokasi: 'Area Outdoor 1', ip: '10.1.1.27', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 18, nama: 'CCTV_18', hostname: 'cctv-18', merk: 'Hikvision DS-2', lokasi: 'Area Outdoor 2', ip: '10.1.1.28', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' },
-        { id: 19, nama: 'CCTV_19', hostname: 'cctv-19', merk: 'Hikvision DS-2', lokasi: 'Peron 4', ip: '10.1.1.29', status: 'tidak_aktif', kondisi: 'Perlu Perbaikan', jenis: 'CCTV IP Camera' },
-        { id: 20, nama: 'CCTV_20', hostname: 'cctv-20', merk: 'Hikvision DS-2', lokasi: 'Peron 5', ip: '10.1.1.30', status: 'aktif', kondisi: 'Baik', jenis: 'CCTV IP Camera' }
+    kondisi: '',
+  })
+  const [currentData, setCurrentData] = useState(null)
+
+  // Data Detail per perangkat (struktur: '1-1' = lokasi 1, perangkat 1)
+  const DetailData = {
+    '1-1': { // Stasiun Lempuyangan - CCTV IP Camera
+      perangkatNama: 'CCTV IP Camera',
+      lokasiNama: 'Stasiun Lempuyangan',
+      total: 20,
+      aktif: 18,
+      nonAktif: 2,
+      items: [
+        { id: 1, nama: 'CCTV_01', hostname: 'cctv-01', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Utara 1', ip: '10.1.1.11', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 2, nama: 'CCTV_02', hostname: 'cctv-02', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Utara 2', ip: '10.1.1.12', status: 'tidak_aktif', kondisi: 'TSO', jenis: 'CCTV IP Camera' },
+        { id: 3, nama: 'CCTV_03', hostname: 'cctv-03', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Barat', ip: '10.1.1.13', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 4, nama: 'CCTV_04', hostname: 'cctv-04', merk: 'Hikvision DS-2', lokasi: 'Peron 1', ip: '10.1.1.14', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 5, nama: 'CCTV_05', hostname: 'cctv-05', merk: 'Hikvision DS-2', lokasi: 'Peron 2', ip: '10.1.1.15', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 6, nama: 'CCTV_06', hostname: 'cctv-06', merk: 'Hikvision DS-2', lokasi: 'Peron 3', ip: '10.1.1.16', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 7, nama: 'CCTV_07', hostname: 'cctv-07', merk: 'Hikvision DS-2', lokasi: 'Ruang Tunggu', ip: '10.1.1.17', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 8, nama: 'CCTV_08', hostname: 'cctv-08', merk: 'Hikvision DS-2', lokasi: 'Loket Tiket', ip: '10.1.1.18', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 9, nama: 'CCTV_09', hostname: 'cctv-09', merk: 'Hikvision DS-2', lokasi: 'Area Kantor', ip: '10.1.1.19', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 10, nama: 'CCTV_10', hostname: 'cctv-10', merk: 'Hikvision DS-2', lokasi: 'Koridor Utama', ip: '10.1.1.20', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 11, nama: 'CCTV_11', hostname: 'cctv-11', merk: 'Hikvision DS-2', lokasi: 'Tangga Darurat 1', ip: '10.1.1.21', status: 'tidak_aktif', kondisi: 'TSO', jenis: 'CCTV IP Camera' },
+        { id: 12, nama: 'CCTV_12', hostname: 'cctv-12', merk: 'Hikvision DS-2', lokasi: 'Tangga Darurat 2', ip: '10.1.1.22', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 13, nama: 'CCTV_13', hostname: 'cctv-13', merk: 'Hikvision DS-2', lokasi: 'Area Parkir', ip: '10.1.1.23', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 14, nama: 'CCTV_14', hostname: 'cctv-14', merk: 'Hikvision DS-2', lokasi: 'Pintu Keluar', ip: '10.1.1.24', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 15, nama: 'CCTV_15', hostname: 'cctv-15', merk: 'Hikvision DS-2', lokasi: 'Basement', ip: '10.1.1.25', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 16, nama: 'CCTV_16', hostname: 'cctv-16', merk: 'Hikvision DS-2', lokasi: 'Ruang Mesin', ip: '10.1.1.26', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 17, nama: 'CCTV_17', hostname: 'cctv-17', merk: 'Hikvision DS-2', lokasi: 'Area Outdoor 1', ip: '10.1.1.27', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 18, nama: 'CCTV_18', hostname: 'cctv-18', merk: 'Hikvision DS-2', lokasi: 'Area Outdoor 2', ip: '10.1.1.28', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 19, nama: 'CCTV_19', hostname: 'cctv-19', merk: 'Hikvision DS-2', lokasi: 'Peron 4', ip: '10.1.1.29', status: 'tidak_aktif', kondisi: 'TSO', jenis: 'CCTV IP Camera' },
+        { id: 20, nama: 'CCTV_20', hostname: 'cctv-20', merk: 'Hikvision DS-2', lokasi: 'Peron 5', ip: '10.1.1.30', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' }
       ]
     },
 
@@ -153,56 +153,10 @@ function DetailInventaris() {
         { id: 6, nama: 'CCTV_PJL_06', lokasi: 'Gudang', status: 'aktif', jenis: 'CCTV IP Camera' }
       ]
     },
-    '6-2': { // PJL Lempuyangan - NVR Server
-      perangkatNama: 'NVR Server',
-      lokasiNama: 'PJL Lempuyangan',
-      total: 1,
-      aktif: 1,
-      nonAktif: 0,
-      items: [
-        { id: 1, nama: 'NVR_PJL_01', lokasi: 'Ruang Server', status: 'aktif', jenis: 'NVR Server' }
-      ]
-    },
     '6': { // PJL Lempuyangan - Semua Perangkat
       perangkatNama: 'Semua Perangkat',
       lokasiNama: 'PJL Lempuyangan',
       items: []
-    },
-    '1-2': { // Stasiun Lempuyangan - NVR Server
-      perangkatNama: 'NVR Server',
-      lokasiNama: 'Stasiun Lempuyangan',
-      total: 2,
-      aktif: 2,
-      nonAktif: 0,
-      items: [
-        { id: 1, nama: 'NVR_SL_01', lokasi: 'Ruang Server 1', status: 'aktif', jenis: 'NVR Server' },
-        { id: 2, nama: 'NVR_SL_02', lokasi: 'Ruang Server 2', status: 'aktif', jenis: 'NVR Server' }
-      ]
-    },
-    '1-3': { // Stasiun Lempuyangan - Core Switch
-      perangkatNama: 'Core Switch',
-      lokasiNama: 'Stasiun Lempuyangan',
-      total: 1,
-      aktif: 1,
-      nonAktif: 0,
-      items: [
-        { id: 1, nama: 'CS_SL_01', lokasi: 'Ruang Server', status: 'aktif', jenis: 'Core Switch' }
-      ]
-    },
-    '1-4': { // Stasiun Lempuyangan - Access Point WiFi
-      perangkatNama: 'Access Point WiFi',
-      lokasiNama: 'Stasiun Lempuyangan',
-      total: 6,
-      aktif: 5,
-      nonAktif: 1,
-      items: [
-        { id: 1, nama: 'AP_WiFi_SL_01', lokasi: 'Lantai 1', status: 'aktif', jenis: 'Access Point WiFi' },
-        { id: 2, nama: 'AP_WiFi_SL_02', lokasi: 'Lantai 2', status: 'aktif', jenis: 'Access Point WiFi' },
-        { id: 3, nama: 'AP_WiFi_SL_03', lokasi: 'Peron', status: 'aktif', jenis: 'Access Point WiFi' },
-        { id: 4, nama: 'AP_WiFi_SL_04', lokasi: 'Ruang Tunggu', status: 'aktif', jenis: 'Access Point WiFi' },
-        { id: 5, nama: 'AP_WiFi_SL_05', lokasi: 'Area Kantor', status: 'aktif', jenis: 'Access Point WiFi' },
-        { id: 6, nama: 'AP_WiFi_SL_06', lokasi: 'Outdoor', status: 'tidak_aktif', jenis: 'Access Point WiFi' }
-      ]
     },
     '2-1': { // Stasiun Tugu - CCTV IP Camera
       perangkatNama: 'CCTV IP Camera',
@@ -298,7 +252,7 @@ function DetailInventaris() {
       'TP-Link Archer'
     ]
 
-    const kondisiPool = ['Baik', 'Perlu Perbaikan', 'Rusak']
+    const kondisiPool = ['SO', 'TSO']
 
     const normalize = (it) => {
       const normalized = { ...it }
@@ -315,8 +269,8 @@ function DetailInventaris() {
     items = items.map(normalize)
 
     const total = items.length
-    const aktif = items.filter(item => item.status === 'aktif').length
-    const nonAktif = total - aktif
+    const aktif = items.filter(item => item.kondisi === 'SO').length
+    const nonAktif = items.filter(item => item.kondisi === 'TSO').length
 
     setCurrentData({
       ...data,
@@ -345,7 +299,7 @@ function DetailInventaris() {
   })
 
   const handleAddItem = () => {
-    setFormData({ nama: '', jenis: '', hostname: '', merk: '', lokasi: '', ip: '', kondisi: 'Baik' })
+    setFormData({ nama: '', jenis: '', hostname: '', merk: '', lokasi: '', ip: '', kondisi: 'SO' })
     setEditingItem(null)
     setShowAddModal(true)
   }
@@ -378,7 +332,7 @@ function DetailInventaris() {
 
     setShowAddModal(false)
     setShowEditModal(false)
-    setFormData({ nama: '', jenis: '', hostname: '', merk: '', lokasi: '', ip: '', kondisi: 'Baik' })
+    setFormData({ nama: '', jenis: '', hostname: '', merk: '', lokasi: '', ip: '', kondisi: 'SO' })
   }
 
   const handleDeleteItem = (itemId) => {
@@ -417,6 +371,21 @@ function DetailInventaris() {
 
   return (
     <div className="detail-Detail-container">
+      {/* Blur Background Overlay */}
+      {(showAddModal || showEditModal || showDeleteModal) && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.3)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 999,
+          pointerEvents: 'none'
+        }} />
+      )}
+
       {/* Header */}
       <div className="Detail-header">
         <button className="back-btn" onClick={() => navigate(-1)}>
@@ -444,7 +413,7 @@ function DetailInventaris() {
               </svg>
             </div>
             <div className="Detail-stat-info">
-              <p className="Detail-stat-label">Total</p>
+              <p className="Detail-stat-label">Total Perangkat</p>
               <p className="Detail-stat-value">{currentData.total}</p>
             </div>
           </div>
@@ -480,7 +449,7 @@ function DetailInventaris() {
         <div className="Detail-list-section">
           <div className="list-header">
             <h2 className="list-title">Daftar Item</h2>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <Button 
                 variant="success" 
                 size="medium"
@@ -494,24 +463,57 @@ function DetailInventaris() {
                 Tambah
               </Button>
 
-              <div className="actions-dropdown-wrapper" style={{ position: 'relative' }}>
-                <button className="actions-dropdown-btn" onClick={() => setShowActionsMenu(!showActionsMenu)} style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-light)', background: 'white' }}>
-                  ⋯
-                </button>
-                {showActionsMenu && (
-                  <div className="actions-dropdown" style={{ position: 'absolute', right: 0, marginTop: 6, background: 'white', border: '1px solid var(--border-light)', borderRadius: 8, padding: 8, zIndex: 40 }}>
-                    <button className="dropdown-action" onClick={() => { setActionMode(null); setShowActionsMenu(false); }}>Tambah (default)</button>
-                    <button className="dropdown-action" onClick={() => { setActionMode('edit'); setShowActionsMenu(false); }}>Mode Edit (klik baris)</button>
-                    <button className="dropdown-action" onClick={() => { setActionMode('delete'); setShowActionsMenu(false); }}>Mode Hapus (klik baris)</button>
-                    <button className="dropdown-action" onClick={() => { setActionMode(null); setShowActionsMenu(false); }}>Batal Mode</button>
-                  </div>
-                )}
-              </div>
-              {actionMode && (
-                <div style={{ marginLeft: 8, padding: '6px 10px', borderRadius: 8, background: 'var(--gray-50)', border: '1px solid var(--border-light)', fontSize: 13 }}>
-                  Mode: {actionMode === 'edit' ? 'Edit' : actionMode === 'delete' ? 'Hapus' : 'Normal'}
-                </div>
-              )}
+              <button 
+                onClick={() => {
+                  setActionMode(actionMode === 'edit' ? null : 'edit')
+                }}
+                style={{ 
+                  padding: '8px 12px', 
+                  borderRadius: '8px', 
+                  border: '1px solid var(--border-light)', 
+                  background: actionMode === 'edit' ? 'var(--primary)' : 'white',
+                  color: actionMode === 'edit' ? 'white' : 'var(--primary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                title={actionMode === 'edit' ? 'Batalkan mode edit' : 'Mode Edit: klik baris untuk mengedit'}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
+              <button 
+                onClick={() => {
+                  setActionMode(actionMode === 'delete' ? null : 'delete')
+                }}
+                style={{ 
+                  padding: '8px 12px', 
+                  borderRadius: '8px', 
+                  border: '1px solid var(--border-light)', 
+                  background: actionMode === 'delete' ? 'var(--danger)' : 'white',
+                  color: actionMode === 'delete' ? 'white' : 'var(--danger)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                title={actionMode === 'delete' ? 'Batalkan mode hapus' : 'Mode Hapus: klik baris untuk menghapus'}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -557,9 +559,8 @@ function DetailInventaris() {
                 className="filter-select"
               >
                 <option value="all">Semua Kondisi</option>
-                <option value="Baik">Baik</option>
-                <option value="Perlu Perbaikan">Perlu Perbaikan</option>
-                <option value="Rusak">Rusak</option>
+                <option value="SO">SO (Siap Operasi)</option>
+                <option value="TSO">TSO (Tidak Siap Operasi)</option>
               </select>
             </div>
           </div>
@@ -581,16 +582,23 @@ function DetailInventaris() {
                 {filteredItems.length > 0 ? (
                   filteredItems.map(item => (
                     <tr key={item.id} onClick={() => {
-                        if (actionMode === 'edit') { handleEditItem(item); setActionMode(null) }
-                        else if (actionMode === 'delete') { handleDeleteItem(item.id); setActionMode(null) }
+                        if (actionMode === 'edit') { 
+                          handleEditItem(item)
+                          setActionMode(null)
+                        }
+                        else if (actionMode === 'delete') { 
+                          setItemToDelete(item)
+                          setShowDeleteModal(true)
+                          setActionMode(null)
+                        }
                       }} style={{ cursor: actionMode ? 'pointer' : 'default' }}>
-                        <td className="jenis-cell">{item.jenis || '-'}</td>
-                        <td className="hostname-cell">{item.hostname || item.nama || '-'}</td>
-                        <td className="merk-cell">{item.merk || '-'}</td>
-                        <td className="lokasi-cell">{item.lokasi}</td>
-                        <td className="ip-cell">{item.ip || '-'}</td>
-                        <td className="kondisi-cell">{item.kondisi || '-'}</td>
-                      </tr>
+                      <td className="jenis-cell">{item.jenis || '-'}</td>
+                      <td className="hostname-cell">{item.hostname || item.nama || '-'}</td>
+                      <td className="merk-cell">{item.merk || '-'}</td>
+                      <td className="lokasi-cell">{item.lokasi}</td>
+                      <td className="ip-cell">{item.ip || '-'}</td>
+                      <td className="kondisi-cell">{item.kondisi || '-'}</td>
+                    </tr>
                   ))
                 ) : (
                     <tr>
@@ -670,7 +678,7 @@ function DetailInventaris() {
 
           <Input
             label="Kondisi"
-            placeholder="Masukkan kondisi (mis. Baik, Rusak...)"
+            placeholder="Masukkan kondisi (mis. SO, TSO...)"
             value={formData.kondisi}
             onChange={(e) => setFormData({ ...formData, kondisi: e.target.value })}
           />

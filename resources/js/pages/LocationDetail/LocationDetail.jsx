@@ -25,7 +25,7 @@ function DetailAset() {
   // Data lokasi berdasarkan ID
   const locationData = {
     1: {
-      name: 'Stasiun Lempuyangan',
+      name: 'Stasiun Lempuyangan (LPN)',
       image: 'https://images.unsplash.com/photo-1561361513-e8d53f0e6f67?w=500&h=300&fit=crop',
       totalPerangkat: 200,
       aktif: 170,
@@ -49,7 +49,7 @@ function DetailAset() {
       ]
     },
     2: {
-      name: 'Stasiun Tugu Yogyakarta',
+      name: 'Stasiun Tugu Yogyakarta (YK)',
       image: 'https://assets.telkomsel.com/public/2025-02/Mengenal-6-Stasiun-Yogyakarta-yang-Bersejarah.jpg?VersionId=TS3XgYVifrRd.Oz_N7tGYe6YYKEf_ngJ',
       totalPerangkat: 250,
       aktif: 210,
@@ -120,7 +120,7 @@ function DetailAset() {
       ]
     },
     5: {
-      name: 'Stasiun Maguwo',
+      name: 'Stasiun Maguwo (MGW)',
       image: 'https://images.unsplash.com/photo-1561361513-e8d53f0e6f67?w=500&h=300&fit=crop',
       totalPerangkat: 95,
       aktif: 80,

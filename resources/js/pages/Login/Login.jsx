@@ -7,17 +7,39 @@ function Login({ onLogin }) {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Login attempt:', { email, password })
     // Extract username from email (part before @)
     const username = email.split('@')[0]
-    onLogin({ email, username })
+    
+    // Cek apakah ada data registrasi di localStorage
+    const userRegistration = localStorage.getItem('userRegistration')
+    let userData = { email, username }
+    
+    if (userRegistration) {
+      const registered = JSON.parse(userRegistration)
+      // Jika email cocok, ambil nama dari registrasi
+      if (registered.email === email) {
+        userData.name = registered.nama
+      }
+    }
+    
+    onLogin(userData)
+  }
+
+  const handleNavigateToRegister = (e) => {
+    e.preventDefault()
+    setIsTransitioning(true)
+    setTimeout(() => {
+      navigate('/register')
+    }, 300)
   }
 
   return (
-    <div className="login-container">
+    <div className={`login-container ${isTransitioning ? 'fade-out' : ''}`}>
       <div className="login-box">
         <div className="logo-section">
           <div className="logo">
@@ -65,7 +87,7 @@ function Login({ onLogin }) {
           </Button>
 
           <div className="register-link">
-            <p>Belum punya akun? <a href="/register" onClick={(e) => { e.preventDefault(); navigate('/register') }}>Daftar di sini</a></p>
+            <p>Belum punya akun? <a href="/register" onClick={handleNavigateToRegister}>Daftar di sini</a></p>
           </div>
         </form>
 

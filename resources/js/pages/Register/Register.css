@@ -6,6 +6,11 @@
   padding: 20px;
   gap: 20px;
   overflow: hidden;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.register-container.fade-out {
+  opacity: 0;
 }
 
 /* Left side - Register Form */

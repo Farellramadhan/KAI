@@ -8,10 +8,10 @@ function Register() {
   const [formData, setFormData] = useState({
     nama: '',
     email: '',
-    nomorHp: '',
     password: '',
     confirmPassword: ''
   })
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -30,13 +30,28 @@ function Register() {
     }
 
     console.log('Register attempt:', formData)
-    // Di sini bisa tambahkan logika registrasi
+    // Simpan data user ke localStorage
+    localStorage.setItem('userRegistration', JSON.stringify({
+      nama: formData.nama,
+      email: formData.email
+    }))
     alert('Registrasi berhasil!')
-    navigate('/')
+    setIsTransitioning(true)
+    setTimeout(() => {
+      navigate('/')
+    }, 300)
+  }
+
+  const handleNavigateToLogin = (e) => {
+    e.preventDefault()
+    setIsTransitioning(true)
+    setTimeout(() => {
+      navigate('/')
+    }, 300)
   }
 
   return (
-    <div className="register-container">
+    <div className={`register-container ${isTransitioning ? 'fade-out' : ''}`}>
       <div className="image-section">
         <img src="/image/bg-login.png" alt="Train" />
       </div>
@@ -80,21 +95,6 @@ function Register() {
           />
 
           <Input
-            type="tel"
-            label="Nomor HP"
-            placeholder="08xxxxxxxxxx"
-            value={formData.nomorHp}
-            onChange={(e) => setFormData(prev => ({ ...prev, nomorHp: e.target.value }))}
-            pattern="[0-9]{10,13}"
-            required
-            leftIcon={
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-            }
-          />
-
-          <Input
             type="password"
             label="Password"
             placeholder="Masukkan password"
@@ -133,7 +133,7 @@ function Register() {
           </Button>
 
           <div className="login-link">
-            <p>Sudah punya akun? <a href="/" onClick={(e) => { e.preventDefault(); navigate('/') }}>Login di sini</a></p>
+            <p>Sudah punya akun? <a href="/" onClick={handleNavigateToLogin}>Login di sini</a></p>
           </div>
         </form>
 

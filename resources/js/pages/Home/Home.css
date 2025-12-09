@@ -87,6 +87,7 @@
 .profile-menu-wrapper {
   position: relative;
   display: none;
+  z-index: 2001;
 }
 
 .profile-mobile-btn {
@@ -114,7 +115,7 @@
   right: 0;
   background: var(--bg);
   min-width: 260px;
-  z-index: 2000;
+  z-index: 2100;
   animation: slideDown 0.3s ease;
   overflow: hidden;
 }
@@ -521,6 +522,42 @@
   font-size: 14px;
 }
 
+/* Add Location Button */
+.add-location-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 50px;
+  height: 50px;
+  background: var(--success);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.add-location-btn:hover {
+  background: var(--success-dark);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.add-location-btn:active {
+  transform: scale(0.95);
+}
+
+.add-location-btn svg {
+  width: 24px;
+  height: 24px;
+  stroke: white;
+}
+
 /* Map Bottom Controls */
 .map-bottom-controls {
   position: absolute;
@@ -777,7 +814,7 @@
     position: absolute;
     top: 16px;
     right: 16px;
-    z-index: 1000;
+    z-index: 2001;
     display: block;
   }
 
@@ -995,6 +1032,18 @@
     bottom: 20px;
     right: 16px;
   }
+
+  .add-location-btn {
+    top: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .add-location-btn svg {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1007,5 +1056,17 @@
     left: 12px;
     right: 12px;
     top: 65px;
+  }
+
+  .add-location-btn {
+    top: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .add-location-btn svg {
+    width: 20px;
+    height: 20px;
   }
 }
