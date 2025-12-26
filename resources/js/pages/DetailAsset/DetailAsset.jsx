@@ -1,18 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Badge, Input, Modal, Loading, Card } from '../../components'
-import { useToast } from '../../components/Toast'
-import { devicesAPI, locationsAPI } from '../../api'
+import { Button, Badge, Input, Modal } from '../../components'
 import './DetailAsset.css'
 
 function DetailInventaris() {
   const navigate = useNavigate()
   const { id, perangkatId } = useParams()
-  const toast = useToast()
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showImportModal, setShowImportModal] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
   const [editingItem, setEditingItem] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -21,7 +17,6 @@ function DetailInventaris() {
   const [activeMenuId, setActiveMenuId] = useState(null)
   const [actionMode, setActionMode] = useState(null) // null | 'edit' | 'delete'
   const [showActionsMenu, setShowActionsMenu] = useState(false)
-  const [selectedItems, setSelectedItems] = useState([]) // For multi-select delete
   const [allItems, setAllItems] = useState([])
   const [formData, setFormData] = useState({
     nama: '',
@@ -33,68 +28,257 @@ function DetailInventaris() {
     kondisi: '',
   })
   const [currentData, setCurrentData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  
-  // Import states
-  const [importFile, setImportFile] = useState(null)
-  const [importLoading, setImportLoading] = useState(false)
-  const [importResult, setImportResult] = useState(null)
-  const fileInputRef = useRef(null)
 
-  // Fetch data from API
+  // Data Detail per perangkat (struktur: '1-1' = lokasi 1, perangkat 1)
+  const DetailData = {
+    '1-1': { // Stasiun Lempuyangan - CCTV IP Camera
+      perangkatNama: 'CCTV IP Camera',
+      lokasiNama: 'Stasiun Lempuyangan',
+      total: 20,
+      aktif: 18,
+      nonAktif: 2,
+      items: [
+        { id: 1, nama: 'CCTV_01', hostname: 'cctv-01', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Utara 1', ip: '10.1.1.11', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 2, nama: 'CCTV_02', hostname: 'cctv-02', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Utara 2', ip: '10.1.1.12', status: 'tidak_aktif', kondisi: 'TSO', jenis: 'CCTV IP Camera' },
+        { id: 3, nama: 'CCTV_03', hostname: 'cctv-03', merk: 'Hikvision DS-2', lokasi: 'Pintu Masuk Barat', ip: '10.1.1.13', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 4, nama: 'CCTV_04', hostname: 'cctv-04', merk: 'Hikvision DS-2', lokasi: 'Peron 1', ip: '10.1.1.14', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 5, nama: 'CCTV_05', hostname: 'cctv-05', merk: 'Hikvision DS-2', lokasi: 'Peron 2', ip: '10.1.1.15', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 6, nama: 'CCTV_06', hostname: 'cctv-06', merk: 'Hikvision DS-2', lokasi: 'Peron 3', ip: '10.1.1.16', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 7, nama: 'CCTV_07', hostname: 'cctv-07', merk: 'Hikvision DS-2', lokasi: 'Ruang Tunggu', ip: '10.1.1.17', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 8, nama: 'CCTV_08', hostname: 'cctv-08', merk: 'Hikvision DS-2', lokasi: 'Loket Tiket', ip: '10.1.1.18', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 9, nama: 'CCTV_09', hostname: 'cctv-09', merk: 'Hikvision DS-2', lokasi: 'Area Kantor', ip: '10.1.1.19', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 10, nama: 'CCTV_10', hostname: 'cctv-10', merk: 'Hikvision DS-2', lokasi: 'Koridor Utama', ip: '10.1.1.20', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 11, nama: 'CCTV_11', hostname: 'cctv-11', merk: 'Hikvision DS-2', lokasi: 'Tangga Darurat 1', ip: '10.1.1.21', status: 'tidak_aktif', kondisi: 'TSO', jenis: 'CCTV IP Camera' },
+        { id: 12, nama: 'CCTV_12', hostname: 'cctv-12', merk: 'Hikvision DS-2', lokasi: 'Tangga Darurat 2', ip: '10.1.1.22', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 13, nama: 'CCTV_13', hostname: 'cctv-13', merk: 'Hikvision DS-2', lokasi: 'Area Parkir', ip: '10.1.1.23', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 14, nama: 'CCTV_14', hostname: 'cctv-14', merk: 'Hikvision DS-2', lokasi: 'Pintu Keluar', ip: '10.1.1.24', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 15, nama: 'CCTV_15', hostname: 'cctv-15', merk: 'Hikvision DS-2', lokasi: 'Basement', ip: '10.1.1.25', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 16, nama: 'CCTV_16', hostname: 'cctv-16', merk: 'Hikvision DS-2', lokasi: 'Ruang Mesin', ip: '10.1.1.26', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 17, nama: 'CCTV_17', hostname: 'cctv-17', merk: 'Hikvision DS-2', lokasi: 'Area Outdoor 1', ip: '10.1.1.27', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 18, nama: 'CCTV_18', hostname: 'cctv-18', merk: 'Hikvision DS-2', lokasi: 'Area Outdoor 2', ip: '10.1.1.28', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' },
+        { id: 19, nama: 'CCTV_19', hostname: 'cctv-19', merk: 'Hikvision DS-2', lokasi: 'Peron 4', ip: '10.1.1.29', status: 'tidak_aktif', kondisi: 'TSO', jenis: 'CCTV IP Camera' },
+        { id: 20, nama: 'CCTV_20', hostname: 'cctv-20', merk: 'Hikvision DS-2', lokasi: 'Peron 5', ip: '10.1.1.30', status: 'aktif', kondisi: 'SO', jenis: 'CCTV IP Camera' }
+      ]
+    },
+
+    // New entries for Kantor Daop 6
+    '3-1': { // Kantor Daop 6 - CCTV IP Camera
+      perangkatNama: 'CCTV IP Camera',
+      lokasiNama: 'Kantor Daop 6 Yogyakarta',
+      total: 8,
+      aktif: 7,
+      nonAktif: 1,
+      items: [
+        { id: 1, nama: 'CCTV_D6_01', lokasi: 'Lobby Utama', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 2, nama: 'CCTV_D6_02', lokasi: 'Ruang Rapat', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 3, nama: 'CCTV_D6_03', lokasi: 'Koridor Selatan', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 4, nama: 'CCTV_D6_04', lokasi: 'Koridor Utara', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 5, nama: 'CCTV_D6_05', lokasi: 'Pintu Masuk Belakang', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 6, nama: 'CCTV_D6_06', lokasi: 'Parkiran', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 7, nama: 'CCTV_D6_07', lokasi: 'Gudang', status: 'tidak_aktif', jenis: 'CCTV IP Camera' },
+        { id: 8, nama: 'CCTV_D6_08', lokasi: 'Tangga Darurat', status: 'aktif', jenis: 'CCTV IP Camera' }
+      ]
+    },
+    '3-2': { // Kantor Daop 6 - NVR Server
+      perangkatNama: 'NVR Server',
+      lokasiNama: 'Kantor Daop 6 Yogyakarta',
+      total: 1,
+      aktif: 1,
+      nonAktif: 0,
+      items: [
+        { id: 1, nama: 'NVR_D6_01', lokasi: 'Ruang Server', status: 'aktif', jenis: 'NVR Server' }
+      ]
+    },
+    '3-3': { // Kantor Daop 6 - Core Switch
+      perangkatNama: 'Core Switch',
+      lokasiNama: 'Kantor Daop 6 Yogyakarta',
+      total: 1,
+      aktif: 1,
+      nonAktif: 0,
+      items: [
+        { id: 1, nama: 'CS_D6_01', lokasi: 'Ruang Server', status: 'aktif', jenis: 'Core Switch' }
+      ]
+    },
+    '3': { // Kantor Daop 6 - Semua Perangkat
+      perangkatNama: 'Semua Perangkat',
+      lokasiNama: 'Kantor Daop 6 Yogyakarta',
+      items: [] // Will be populated dynamically similar to existing pattern
+    },
+
+    // New entries for Gudang Logistik
+    '4-1': { // Gudang Logistik - CCTV IP Camera
+      perangkatNama: 'CCTV IP Camera',
+      lokasiNama: 'Gudang Logistik  Yogyakarta',
+      total: 5,
+      aktif: 5,
+      nonAktif: 0,
+      items: [
+        { id: 1, nama: 'CCTV_GL_01', lokasi: 'Pintu Masuk Utama', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 2, nama: 'CCTV_GL_02', lokasi: 'Area Penataan Barang', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 3, nama: 'CCTV_GL_03', lokasi: 'Area Pengiriman', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 4, nama: 'CCTV_GL_04', lokasi: 'Parkiran', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 5, nama: 'CCTV_GL_05', lokasi: 'Gudang Penyimpanan', status: 'aktif', jenis: 'CCTV IP Camera' }
+      ]
+    },
+    '4-2': { // Gudang Logistik - Access Point WiFi
+      perangkatNama: 'Access Point WiFi',
+      lokasiNama: 'Gudang Logistik  Yogyakarta',
+      total: 2,
+      aktif: 2,
+      nonAktif: 0,
+      items: [
+        { id: 1, nama: 'AP_GL_01', lokasi: 'Area Gudang', status: 'aktif', jenis: 'Access Point WiFi' },
+        { id: 2, nama: 'AP_GL_02', lokasi: 'Ruang Kerja', status: 'aktif', jenis: 'Access Point WiFi' }
+      ]
+    },
+    '4': { // Gudang Logistik - Semua Perangkat
+      perangkatNama: 'Semua Perangkat',
+      lokasiNama: 'Gudang Logistik  Yogyakarta',
+      items: []
+    },
+
+    // New entries for PJL Lempuyangan
+    '6-1': { // PJL Lempuyangan - CCTV IP Camera
+      perangkatNama: 'CCTV IP Camera',
+      lokasiNama: 'PJL Lempuyangan',
+      total: 6,
+      aktif: 6,
+      nonAktif: 0,
+      items: [
+        { id: 1, nama: 'CCTV_PJL_01', lokasi: 'Lobby Utama', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 2, nama: 'CCTV_PJL_02', lokasi: 'Area Parkir', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 3, nama: 'CCTV_PJL_03', lokasi: 'Koridor Utara', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 4, nama: 'CCTV_PJL_04', lokasi: 'Koridor Selatan', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 5, nama: 'CCTV_PJL_05', lokasi: 'Pintu Masuk', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 6, nama: 'CCTV_PJL_06', lokasi: 'Gudang', status: 'aktif', jenis: 'CCTV IP Camera' }
+      ]
+    },
+    '6': { // PJL Lempuyangan - Semua Perangkat
+      perangkatNama: 'Semua Perangkat',
+      lokasiNama: 'PJL Lempuyangan',
+      items: []
+    },
+    '2-1': { // Stasiun Tugu - CCTV IP Camera
+      perangkatNama: 'CCTV IP Camera',
+      lokasiNama: 'Stasiun Tugu Yogyakarta',
+      total: 26,
+      aktif: 24,
+      nonAktif: 2,
+      items: [
+        { id: 1, nama: 'CCTV_ST_01', lokasi: 'Pintu Masuk Utama', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 2, nama: 'CCTV_ST_02', lokasi: 'Pintu Masuk Samping', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 3, nama: 'CCTV_ST_03', lokasi: 'Hall Utama', status: 'tidak_aktif', jenis: 'CCTV IP Camera' },
+        { id: 4, nama: 'CCTV_ST_04', lokasi: 'Peron 1', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 5, nama: 'CCTV_ST_05', lokasi: 'Peron 2', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 6, nama: 'CCTV_ST_06', lokasi: 'Peron 3', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 7, nama: 'CCTV_ST_07', lokasi: 'Peron 4', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 8, nama: 'CCTV_ST_08', lokasi: 'Ruang Tunggu A', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 9, nama: 'CCTV_ST_09', lokasi: 'Ruang Tunggu B', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 10, nama: 'CCTV_ST_10', lokasi: 'Loket Tiket 1', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 11, nama: 'CCTV_ST_11', lokasi: 'Loket Tiket 2', status: 'tidak_aktif', jenis: 'CCTV IP Camera' },
+        { id: 12, nama: 'CCTV_ST_12', lokasi: 'Area Kantor', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 13, nama: 'CCTV_ST_13', lokasi: 'Koridor Utama', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 14, nama: 'CCTV_ST_14', lokasi: 'Tangga Darurat 1', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 15, nama: 'CCTV_ST_15', lokasi: 'Tangga Darurat 2', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 16, nama: 'CCTV_ST_16', lokasi: 'Area Lift', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 17, nama: 'CCTV_ST_17', lokasi: 'Area Parkir Level 1', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 18, nama: 'CCTV_ST_18', lokasi: 'Area Parkir Level 2', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 19, nama: 'CCTV_ST_19', lokasi: 'Pintu Keluar', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 20, nama: 'CCTV_ST_20', lokasi: 'Basement 1', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 21, nama: 'CCTV_ST_21', lokasi: 'Basement 2', status: 'tidak_aktif', jenis: 'CCTV IP Camera' },
+        { id: 22, nama: 'CCTV_ST_22', lokasi: 'Ruang Mesin', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 23, nama: 'CCTV_ST_23', lokasi: 'Area Outdoor 1', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 24, nama: 'CCTV_ST_24', lokasi: 'Area Outdoor 2', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 25, nama: 'CCTV_ST_25', lokasi: 'Peron 5', status: 'aktif', jenis: 'CCTV IP Camera' },
+        { id: 26, nama: 'CCTV_ST_26', lokasi: 'Peron 6', status: 'aktif', jenis: 'CCTV IP Camera' }
+      ]
+    },
+    // Data untuk semua perangkat per lokasi (tanpa perangkatId)
+    '1': { // Stasiun Lempuyangan - Semua Perangkat
+      perangkatNama: 'Semua Perangkat',
+      lokasiNama: 'Stasiun Lempuyangan',
+      items: [] // Akan digabungkan dari semua perangkat
+    },
+    'default': {
+      perangkatNama: 'Perangkat',
+      lokasiNama: 'Lokasi',
+      total: 0,
+      aktif: 0,
+      nonAktif: 0,
+      items: []
+    }
+  }
+
+  // Initialize data dan items
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        setError(null)
+    let data;
+    let items = [];
 
-        // Fetch location details
-        const location = await locationsAPI.getById(id)
-
-        // Fetch devices for this location
-        let devices = await devicesAPI.getByLocation(id)
-        devices = devices || []
-
-        // Filter by device type if perangkatId is provided
-        if (perangkatId && perangkatId !== 'all') {
-          devices = devices.filter(device => device.type === perangkatId)
-        }
-
-        // Map API response to component format
-        const items = devices.map(device => ({
-          id: device.id,
-          nama: device.name,
-          jenis: device.type,
-          hostname: device.name,
-          merk: device.serial_number || '-',
-          lokasi: device.description || location.name,
-          ip: device.ip_address || '-',
-          kondisi: device.status === 'active' ? 'SO' : 'TSO',
-          status: device.status
-        }))
-
-        // Calculate statistics
-        const total = items.length
-        const aktif = items.filter(item => item.kondisi === 'SO').length
-        const nonAktif = items.filter(item => item.kondisi === 'TSO').length
-
-        setCurrentData({
-          perangkatNama: perangkatId && perangkatId !== 'all' ? perangkatId : 'Semua Perangkat',
-          lokasiNama: location.name,
-          total,
-          aktif,
-          nonAktif
-        })
-        setAllItems(items)
-        setLoading(false)
-      } catch (err) {
-        setError(err.message || 'Gagal Memuat Data')
-        setLoading(false)
+    if (perangkatId) {
+      // Jika ada perangkatId, ambil data perangkat spesifik
+      data = DetailData[`${id}-${perangkatId}`] || DetailData.default
+      items = data.items || []
+    } else {
+      // Jika tidak ada perangkatId, gabungkan semua perangkat dari lokasi
+      const lokasiNameMap = {
+        '1': 'Stasiun Lempuyangan',
+        '2': 'Stasiun Tugu Yogyakarta',
+        '3': 'Kantor Daop 6 Yogyakarta',
+        '4': 'Gudang Logistik Yogyakarta',
+        '6': 'PJL Lempuyangan',
+      }
+      const lokasiName = lokasiNameMap[id] || 'Lokasi Tidak Dikenal'
+      const allPerangkatKeys = Object.keys(DetailData).filter(key => key.startsWith(`${id}-`))
+      
+      // Gabungkan semua items dari semua perangkat
+      items = allPerangkatKeys.flatMap(key => DetailData[key].items || [])
+      
+      data = {
+        perangkatNama: 'Semua Perangkat',
+        lokasiNama: lokasiName,
+        items: items
       }
     }
 
-    fetchData()
+    // Hitung total, aktif, nonAktif dari items
+    // Normalize items to ensure fields: jenis, hostname, merk, ip, kondisi
+    const merkPool = [
+      'Hikvision DS-2',
+      'Dahua X-Series',
+      'Ubiquiti UniFi',
+      'Cisco Catalyst',
+      'MikroTik RouterBOARD',
+      'Dell PowerEdge',
+      'TP-Link Archer'
+    ]
+
+    const kondisiPool = ['SO', 'TSO']
+
+    const normalize = (it) => {
+      const normalized = { ...it }
+      normalized.jenis = normalized.jenis || normalized.nama || 'Perangkat'
+      normalized.hostname = normalized.hostname || (
+        (normalized.nama || '').toString().toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      )
+      normalized.merk = normalized.merk || merkPool[Math.abs((normalized.id || 0)) % merkPool.length]
+      normalized.ip = normalized.ip || `10.${id || '0'}.${normalized.id || '0'}`
+      normalized.kondisi = normalized.kondisi || kondisiPool[Math.abs((normalized.id || 0)) % kondisiPool.length]
+      return normalized
+    }
+
+    items = items.map(normalize)
+
+    const total = items.length
+    const aktif = items.filter(item => item.kondisi === 'SO').length
+    const nonAktif = items.filter(item => item.kondisi === 'TSO').length
+
+    setCurrentData({
+      ...data,
+      total,
+      aktif,
+      nonAktif
+    })
+    setAllItems(items)
   }, [id, perangkatId])
 
   // Extract unique jenis perangkat untuk filter
@@ -126,82 +310,29 @@ function DetailInventaris() {
     setShowEditModal(true)
   }
 
-  const handleSaveItem = async () => {
+  const handleSaveItem = () => {
     if (!formData.jenis || !formData.hostname || !formData.lokasi) {
-      toast.warning('Field Jenis, Hostname, dan Lokasi harus diisi!')
+      alert('Field Jenis, Hostname, dan Lokasi harus diisi!')
       return
     }
 
-    try {
-      if (editingItem) {
-        // Update existing device
-        const deviceData = {
-          location_id: id,
-          name: formData.hostname,
-          type: formData.jenis,
-          status: formData.kondisi === 'SO' ? 'active' : 'inactive',
-          serial_number: formData.merk,
-          description: formData.lokasi,
-          ip_address: formData.ip
-        }
-        
-        await devicesAPI.update(editingItem, deviceData)
-        
-        // Update local state
-        setAllItems(allItems.map(item => 
-          item.id === editingItem ? { ...formData, id: editingItem } : item
-        ))
-        
-        // Update stats
-        const updatedItems = allItems.map(item => 
-          item.id === editingItem ? { ...formData, id: editingItem } : item
-        )
-        const total = updatedItems.length
-        const aktif = updatedItems.filter(item => item.kondisi === 'SO').length
-        const nonAktif = updatedItems.filter(item => item.kondisi === 'TSO').length
-        setCurrentData(prev => ({ ...prev, total, aktif, nonAktif }))
-      } else {
-        // Create new device
-        const deviceData = {
-          location_id: id,
-          name: formData.hostname,
-          type: formData.jenis,
-          status: formData.kondisi === 'SO' ? 'active' : 'inactive',
-          serial_number: formData.merk,
-          description: formData.lokasi,
-          ip_address: formData.ip
-        }
-        
-        const newDevice = await devicesAPI.create(deviceData)
-        
-        // Add to local state
-        const newItem = {
-          id: newDevice.id,
-          nama: newDevice.name,
-          jenis: newDevice.type,
-          hostname: newDevice.name,
-          merk: newDevice.serial_number,
-          lokasi: newDevice.description,
-          ip: newDevice.ip_address || '-',
-          kondisi: newDevice.status === 'active' ? 'SO' : 'TSO'
-        }
-        
-        const updatedItems = [...allItems, newItem]
-        setAllItems(updatedItems)
-        
-        // Update stats
-        const total = updatedItems.length
-        const aktif = updatedItems.filter(item => item.kondisi === 'SO').length
-        const nonAktif = updatedItems.filter(item => item.kondisi === 'TSO').length
-        setCurrentData(prev => ({ ...prev, total, aktif, nonAktif }))
+    if (editingItem) {
+      setAllItems(allItems.map(item => 
+        item.id === editingItem ? { ...formData, id: editingItem } : item
+      ))
+      console.log('Update item:', formData)
+    } else {
+      const newItem = {
+        id: Math.max(...allItems.map(i => i.id), 0) + 1,
+        ...formData
       }
-
-      setShowAddModal(false)
-      setShowEditModal(false)
-      setFormData({ nama: '', jenis: '', hostname: '', merk: '', lokasi: '', ip: '', kondisi: 'SO' })
-    } catch (error) {
-      toast.error('Gagal menyimpan data: ' + (error.response?.data?.message || error.message))
+      setAllItems([...allItems, newItem])
+      console.log('Add item:', newItem)
     }
+
+    setShowAddModal(false)
+    setShowEditModal(false)
+    setFormData({ nama: '', jenis: '', hostname: '', merk: '', lokasi: '', ip: '', kondisi: 'SO' })
   }
 
   const handleDeleteItem = (itemId) => {
@@ -210,293 +341,29 @@ function DetailInventaris() {
     setShowDeleteModal(true)
   }
 
-  const confirmDelete = async () => {
-    // Handle multiple delete
-    if (selectedItems.length > 0) {
-      try {
-        // Use bulk delete API for better performance
-        await devicesAPI.bulkDelete(selectedItems)
-        
-        // Update local state
-        const updatedItems = allItems.filter(item => !selectedItems.includes(item.id))
-        setAllItems(updatedItems)
-        
-        // Update stats
-        const total = updatedItems.length
-        const aktif = updatedItems.filter(item => item.kondisi === 'SO').length
-        const nonAktif = updatedItems.filter(item => item.kondisi === 'TSO').length
-        setCurrentData(prev => ({ ...prev, total, aktif, nonAktif }))
-        
-        setShowDeleteModal(false)
-        setSelectedItems([])
-        setActionMode(null)
-      } catch (error) {
-        toast.error('Gagal menghapus data: ' + (error.response?.data?.message || error.message))
-      }
-    } else if (itemToDelete) {
-      try {
-        await devicesAPI.delete(itemToDelete.id)
-        
-        // Update local state
-        const updatedItems = allItems.filter(item => item.id !== itemToDelete.id)
-        setAllItems(updatedItems)
-        
-        // Update stats
-        const total = updatedItems.length
-        const aktif = updatedItems.filter(item => item.kondisi === 'SO').length
-        const nonAktif = updatedItems.filter(item => item.kondisi === 'TSO').length
-        setCurrentData(prev => ({ ...prev, total, aktif, nonAktif }))
-        
-        setShowDeleteModal(false)
-        setItemToDelete(null)
-        setActiveMenuId(null)
-      } catch (error) {
-        toast.error('Gagal menghapus data: ' + (error.response?.data?.message || error.message))
-      }
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      setAllItems(allItems.filter(item => item.id !== itemToDelete.id))
+      console.log('Delete item:', itemToDelete.id)
+      setShowDeleteModal(false)
+      setItemToDelete(null)
+      setActiveMenuId(null)
     }
   }
 
   const cancelDelete = () => {
     setShowDeleteModal(false)
     setItemToDelete(null)
-    setSelectedItems([])
-  }
-
-  // Toggle item selection
-  const toggleItemSelection = (itemId) => {
-    setSelectedItems(prev => {
-      if (actionMode === 'edit') {
-        // For edit mode, only allow single selection
-        return prev.includes(itemId) ? [] : [itemId]
-      } else {
-        // For delete mode, allow multiple selection
-        return prev.includes(itemId) 
-          ? prev.filter(id => id !== itemId)
-          : [...prev, itemId]
-      }
-    })
-  }
-
-  // Select all items
-  const toggleSelectAll = () => {
-    if (selectedItems.length === filteredItems.length) {
-      setSelectedItems([])
-    } else {
-      setSelectedItems(filteredItems.map(item => item.id))
-    }
-  }
-
-  // Handle delete selected
-  const handleDeleteSelected = () => {
-    if (selectedItems.length > 0) {
-      setShowDeleteModal(true)
-    }
-  }
-
-  // Handle edit selected
-  const handleEditSelected = () => {
-    if (selectedItems.length === 1) {
-      const itemToEdit = allItems.find(item => item.id === selectedItems[0])
-      if (itemToEdit) {
-        // Set form data dengan nilai dari item yang dipilih
-        setFormData({
-          nama: itemToEdit.nama || '',
-          jenis: itemToEdit.jenis || '',
-          hostname: itemToEdit.hostname || '',
-          merk: itemToEdit.merk || '',
-          lokasi: itemToEdit.lokasi || '',
-          ip: itemToEdit.ip || '',
-          kondisi: itemToEdit.kondisi || 'SO',
-        })
-        setEditingItem(selectedItems[0])
-        setShowEditModal(true)
-        setSelectedItems([])
-        setActionMode(null)
-      }
-    }
-  }
-
-  // Handle import file change
-  const handleImportFileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      // Validate file type
-      const allowedTypes = [
-        'text/csv',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      ]
-      const fileExtension = file.name.split('.').pop().toLowerCase()
-      const validExtensions = ['csv', 'xls', 'xlsx']
-      
-      if (!validExtensions.includes(fileExtension)) {
-        toast.warning('Format file tidak didukung. Gunakan CSV, XLS, atau XLSX.')
-        return
-      }
-      
-      // Validate file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.warning('Ukuran file terlalu besar. Maksimal 10MB.')
-        return
-      }
-      
-      setImportFile(file)
-      setImportResult(null)
-    }
-  }
-
-  // Handle import submit
-  const handleImportSubmit = async () => {
-    if (!importFile) {
-      toast.warning('Pilih file terlebih dahulu')
-      return
-    }
-
-    try {
-      setImportLoading(true)
-      setImportResult(null)
-
-      const result = await devicesAPI.bulkImport(id, importFile)
-      
-      // Map API response to component format
-      const mappedResult = {
-        success: result.inserted || 0,
-        failed: (result.total_rows || 0) - (result.inserted || 0),
-        errors: (result.errors || []).map((msg, idx) => {
-          // Parse error message format: "Baris X: message"
-          const match = msg.match(/Baris (\d+): (.+)/)
-          if (match) {
-            return { row: parseInt(match[1]), message: match[2] }
-          }
-          return { row: idx + 1, message: msg }
-        })
-      }
-      
-      setImportResult(mappedResult)
-      
-      // If import successful, refresh data
-      if (mappedResult.success > 0) {
-        // Fetch updated devices
-        let devices = await devicesAPI.getByLocation(id)
-        devices = devices || []
-        
-        // Filter by device type if perangkatId is provided
-        if (perangkatId && perangkatId !== 'all') {
-          devices = devices.filter(device => device.type === perangkatId)
-        }
-
-        // Map API response to component format
-        const items = devices.map(device => ({
-          id: device.id,
-          nama: device.name,
-          jenis: device.type,
-          hostname: device.name,
-          merk: device.serial_number || '-',
-          lokasi: device.description || currentData.lokasiNama,
-          ip: device.ip_address || '-',
-          kondisi: device.status === 'active' ? 'SO' : 'TSO',
-          status: device.status
-        }))
-
-        // Update stats
-        const total = items.length
-        const aktif = items.filter(item => item.kondisi === 'SO').length
-        const nonAktif = items.filter(item => item.kondisi === 'TSO').length
-
-        setAllItems(items)
-        setCurrentData(prev => ({ ...prev, total, aktif, nonAktif }))
-      }
-    } catch (error) {
-      setImportResult({
-        success: 0,
-        failed: 0,
-        errors: [{ row: 0, message: error.message || 'Gagal mengimpor data' }]
-      })
-    } finally {
-      setImportLoading(false)
-    }
-  }
-
-  // Close import modal
-  const closeImportModal = () => {
-    setShowImportModal(false)
-    setImportFile(null)
-    setImportResult(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }
-
-  // Download template
-  const handleDownloadTemplate = async () => {
-    try {
-      const blob = await devicesAPI.downloadTemplate()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'template_import_perangkat.xlsx'
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-    } catch (error) {
-      toast.error('Gagal mengunduh template')
-    }
-  }
-
-  if (loading) {
-    return <Loading message="Memuat Detail Perangkat..." />
-  }
-
-  if (error) {
-    return (
-      <div className="detail-Detail-container">
-        <div className="Detail-header">
-          <Button 
-            variant="ghost" 
-            className="back-btn" 
-            onClick={() => window.handleBackNavigation()}
-            icon={
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            }
-          />
-          <h1 className="Detail-title">Error</h1>
-        </div>
-        <div className="Detail-content">
-          <Card variant="outlined" className="error-card">
-            <div className="error-content">
-              <Badge variant="danger" size="large">Error</Badge>
-              <p className="error-message">{error}</p>
-              <Button 
-                variant="primary" 
-                onClick={() => window.location.reload()}
-              >
-                Coba Lagi
-              </Button>
-            </div>
-          </Card>
-        </div>
-      </div>
-    )
   }
 
   if (!currentData) {
     return (
       <div className="detail-Detail-container">
         <div className="Detail-header">
-          <Button 
-            variant="ghost" 
-            className="back-btn" 
-            onClick={() => window.handleBackNavigation()}
-            icon={
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            }
-          />
-          <h1 className="Detail-title">Data tidak ditemukan</h1>
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            <span>&lt;</span>
+          </button>
+          <h1 className="Detail-title">Memuat data...</h1>
         </div>
       </div>
     )
@@ -505,7 +372,7 @@ function DetailInventaris() {
   return (
     <div className="detail-Detail-container">
       {/* Blur Background Overlay */}
-      {(showAddModal || showEditModal || showDeleteModal || showImportModal) && (
+      {(showAddModal || showEditModal || showDeleteModal) && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -521,16 +388,11 @@ function DetailInventaris() {
 
       {/* Header */}
       <div className="Detail-header">
-        <Button 
-          variant="ghost" 
-          className="back-btn" 
-          onClick={() => window.handleBackNavigation()}
-          icon={
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          }
-        />
+        <button className="back-btn" onClick={() => navigate(-1)}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
         <div className="header-info">
           <h1 className="Detail-title">{currentData.perangkatNama}</h1>
           <p className="Detail-subtitle">{currentData.lokasiNama}</p>
@@ -564,7 +426,7 @@ function DetailInventaris() {
               </svg>
             </div>
             <div className="Detail-stat-info">
-              <p className="Detail-stat-label">SO (Siap Operasi)</p>
+              <p className="Detail-stat-label">SO (Siap Operasi))</p>
               <p className="Detail-stat-value">{currentData.aktif}</p>
             </div>
           </div>
@@ -587,84 +449,71 @@ function DetailInventaris() {
         <div className="Detail-list-section">
           <div className="list-header">
             <h2 className="list-title">Daftar Item</h2>
-            <div className="action-buttons-group">
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <Button 
-                variant="success"
+                variant="success" 
                 size="medium"
-                className="action-btn"
                 onClick={handleAddItem}
-                title="Tambah item baru"
                 icon={
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <svg viewBox="0 0 24 24" fill="none">
                     <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                   </svg>
                 }
               >
-                <span className="btn-text-responsive">Tambah</span>
+                Tambah
               </Button>
 
-              <Button 
-                variant="primary"
-                size="medium"
-                className="action-btn"
-                onClick={() => setShowImportModal(true)}
-                title="Import dari CSV/Excel"
-                icon={
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                }
-              >
-                <span className="btn-text-responsive">Import</span>
-              </Button>
-
-              <Button 
-                variant="secondary"
-                size="medium"
-                className="action-btn"
+              <button 
                 onClick={() => {
-                  if (actionMode === 'edit') {
-                    setActionMode(null)
-                    setSelectedItems([])
-                  } else {
-                    setActionMode('edit')
-                  }
+                  setActionMode(actionMode === 'edit' ? null : 'edit')
                 }}
-                title={actionMode === 'edit' ? 'Batalkan mode edit' : 'Mode Edit: pilih item untuk mengedit'}
-                icon={
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                }
+                style={{ 
+                  padding: '8px 12px', 
+                  borderRadius: '8px', 
+                  border: '1px solid var(--border-light)', 
+                  background: actionMode === 'edit' ? 'var(--primary)' : 'white',
+                  color: actionMode === 'edit' ? 'white' : 'var(--primary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                title={actionMode === 'edit' ? 'Batalkan mode edit' : 'Mode Edit: klik baris untuk mengedit'}
               >
-                <span className="btn-text-responsive">Edit</span>
-              </Button>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
 
-              <Button 
-                variant="danger"
-                size="medium"
-                className="action-btn"
+              <button 
                 onClick={() => {
-                  if (actionMode === 'delete') {
-                    setActionMode(null)
-                    setSelectedItems([])
-                  } else {
-                    setActionMode('delete')
-                  }
+                  setActionMode(actionMode === 'delete' ? null : 'delete')
                 }}
-                title={actionMode === 'delete' ? 'Batalkan mode hapus' : 'Mode Hapus: pilih item untuk menghapus'}
-                icon={
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                }
+                style={{ 
+                  padding: '8px 12px', 
+                  borderRadius: '8px', 
+                  border: '1px solid var(--border-light)', 
+                  background: actionMode === 'delete' ? 'var(--danger)' : 'white',
+                  color: actionMode === 'delete' ? 'white' : 'var(--danger)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                title={actionMode === 'delete' ? 'Batalkan mode hapus' : 'Mode Hapus: klik baris untuk menghapus'}
               >
-                <span className="btn-text-responsive">Hapus</span>
-              </Button>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -674,7 +523,7 @@ function DetailInventaris() {
               <Input
                 type="text"
                 label="Cari"
-                placeholder="Cari Hostname, Lokasi, IP..."
+                placeholder="Cari nama atau lokasi..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 leftIcon={
@@ -716,72 +565,11 @@ function DetailInventaris() {
             </div>
           </div>
 
-          {/* Selected Items Action Bar */}
-          {((actionMode === 'delete' && selectedItems.length > 0) || (actionMode === 'edit' && selectedItems.length > 0)) && (
-            <div className="selected-action-bar">
-              <span className="selected-count">{selectedItems.length} item dipilih</span>
-              <div className="selected-actions">
-                <Button 
-                  variant="danger" 
-                  size="small"
-                  onClick={() => setSelectedItems([])}
-                >
-                  Batal
-                </Button>
-                {actionMode === 'delete' && (
-                  <Button 
-                    variant="danger" 
-                    size="small"
-                    onClick={handleDeleteSelected}
-                    icon={
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    }
-                  >
-                    Hapus ({selectedItems.length})
-                  </Button>
-                )}
-                {actionMode === 'edit' && selectedItems.length === 1 && (
-                  <Button 
-                    variant="secondary" 
-                    size="small"
-                    onClick={handleEditSelected}
-                    icon={
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    }
-                  >
-                    Edit Item
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-
           {/* Table */}
           <div className="table-wrapper">
             <table className="Detail-table">
               <thead>
                 <tr>
-                  {(actionMode === 'delete' || actionMode === 'edit') && (
-                    <th className="checkbox-cell">
-                      {actionMode === 'delete' && (
-                        <input 
-                          type="checkbox" 
-                          checked={filteredItems.length > 0 && selectedItems.length === filteredItems.length}
-                          onChange={toggleSelectAll}
-                          className="row-checkbox"
-                        />
-                      )}
-                      {actionMode === 'edit' && (
-                        <span className="checkbox-header-text">Pilih</span>
-                      )}
-                    </th>
-                  )}
                   <th>Jenis Perangkat</th>
                   <th>Hostname</th>
                   <th>Merk / Spek</th>
@@ -793,45 +581,28 @@ function DetailInventaris() {
               <tbody>
                 {filteredItems.length > 0 ? (
                   filteredItems.map(item => (
-                    <tr 
-                      key={item.id} 
-                      className={selectedItems.includes(item.id) ? 'selected-row' : ''}
-                      onClick={(e) => {
-                        // Prevent row click when clicking checkbox
-                        if (e.target.type === 'checkbox') return
-                        
-                        if (actionMode === 'edit' || actionMode === 'delete') { 
-                          toggleItemSelection(item.id)
+                    <tr key={item.id} onClick={() => {
+                        if (actionMode === 'edit') { 
+                          handleEditItem(item)
+                          setActionMode(null)
                         }
-                      }} 
-                      style={{ cursor: actionMode ? 'pointer' : 'default' }}
-                    >
-                      {(actionMode === 'delete' || actionMode === 'edit') && (
-                        <td className="checkbox-cell">
-                          <input 
-                            type="checkbox" 
-                            checked={selectedItems.includes(item.id)}
-                            onChange={() => toggleItemSelection(item.id)}
-                            className="row-checkbox"
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        </td>
-                      )}
+                        else if (actionMode === 'delete') { 
+                          setItemToDelete(item)
+                          setShowDeleteModal(true)
+                          setActionMode(null)
+                        }
+                      }} style={{ cursor: actionMode ? 'pointer' : 'default' }}>
                       <td className="jenis-cell">{item.jenis || '-'}</td>
                       <td className="hostname-cell">{item.hostname || item.nama || '-'}</td>
                       <td className="merk-cell">{item.merk || '-'}</td>
                       <td className="lokasi-cell">{item.lokasi}</td>
                       <td className="ip-cell">{item.ip || '-'}</td>
-                      <td className="kondisi-cell">
-                        <Badge variant={item.kondisi === 'SO' ? 'success' : 'danger'} size="small">
-                          {item.kondisi || '-'}
-                        </Badge>
-                      </td>
+                      <td className="kondisi-cell">{item.kondisi || '-'}</td>
                     </tr>
                   ))
                 ) : (
                     <tr>
-                      <td colSpan={actionMode === 'delete' ? 7 : 6} className="empty-state">Tidak ada data</td>
+                      <td colSpan="6" className="empty-state">Tidak ada data</td>
                     </tr>
                 )}
               </tbody>
@@ -852,7 +623,7 @@ function DetailInventaris() {
         footer={
           <>
             <Button
-              variant="danger"
+              variant="ghost"
               onClick={() => {
                 setShowAddModal(false)
                 setShowEditModal(false)
@@ -872,42 +643,42 @@ function DetailInventaris() {
           <div className="modal-body">
           <Input
             label="Jenis Perangkat"
-            placeholder="Masukkan Jenis Perangkat"
+            placeholder="Masukkan jenis perangkat"
             value={formData.jenis}
             onChange={(e) => setFormData({ ...formData, jenis: e.target.value })}
           />
 
           <Input
             label="Hostname"
-            placeholder="Masukkan Hostname"
+            placeholder="Masukkan hostname"
             value={formData.hostname}
             onChange={(e) => setFormData({ ...formData, hostname: e.target.value })}
           />
 
           <Input
             label="Merk / Spek"
-            placeholder="Masukkan Merk Atau Spesifikasi"
+            placeholder="Masukkan merk atau spesifikasi"
             value={formData.merk}
             onChange={(e) => setFormData({ ...formData, merk: e.target.value })}
           />
 
           <Input
             label="Lokasi"
-            placeholder="Masukkan Lokasi"
+            placeholder="Masukkan lokasi"
             value={formData.lokasi}
             onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
           />
 
           <Input
             label="IP Perangkat"
-            placeholder="Masukkan IP Perangkat"
+            placeholder="Masukkan IP perangkat"
             value={formData.ip}
             onChange={(e) => setFormData({ ...formData, ip: e.target.value })}
           />
 
           <Input
             label="Kondisi"
-            placeholder="Masukkan Kondisi (Mis. SO, TSO...)"
+            placeholder="Masukkan kondisi (mis. SO, TSO...)"
             value={formData.kondisi}
             onChange={(e) => setFormData({ ...formData, kondisi: e.target.value })}
           />
@@ -920,12 +691,12 @@ function DetailInventaris() {
       <Modal
         isOpen={showDeleteModal}
         onClose={cancelDelete}
-        title={selectedItems.length > 1 ? `Hapus ${selectedItems.length} Item` : 'Konfirmasi Hapus'}
+        title="Konfirmasi Hapus"
         size="small"
         footer={
           <>
             <Button
-              variant="danger"
+              variant="ghost"
               onClick={cancelDelete}
             >
               Batal
@@ -940,46 +711,12 @@ function DetailInventaris() {
                 </svg>
               }
             >
-              Hapus {selectedItems.length > 1 ? `(${selectedItems.length})` : ''}
+              Hapus
             </Button>
           </>
         }
       >
-        {selectedItems.length > 0 ? (
-          <div style={{ padding: '10px 0' }}>
-            <p style={{ marginBottom: '15px', color: 'var(--text-main)' }}>
-              Apakah Anda yakin ingin menghapus <strong>{selectedItems.length}</strong> item yang dipilih?
-            </p>
-            <div style={{ 
-              background: 'var(--gray-50)', 
-              padding: '12px', 
-              borderRadius: '8px',
-              border: '1px solid var(--border-light)',
-              maxHeight: '200px',
-              overflowY: 'auto'
-            }}>
-              {selectedItems.map((itemId, index) => {
-                const item = allItems.find(i => i.id === itemId)
-                return item ? (
-                  <div key={itemId} style={{ 
-                    padding: '8px 0', 
-                    borderBottom: index < selectedItems.length - 1 ? '1px solid var(--border-light)' : 'none'
-                  }}>
-                    <p style={{ margin: '0', fontWeight: '500', fontSize: '14px', color: 'var(--text-main)' }}>
-                      {item.hostname || item.nama || '-'}
-                    </p>
-                    <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                      {item.jenis} • {item.lokasi}
-                    </p>
-                  </div>
-                ) : null
-              })}
-            </div>
-            <p style={{ marginTop: '15px', fontSize: '13px', color: 'var(--text-muted)' }}>
-              Tindakan ini tidak dapat dibatalkan.
-            </p>
-          </div>
-        ) : itemToDelete && (
+        {itemToDelete && (
           <div style={{ padding: '10px 0' }}>
             <p style={{ marginBottom: '15px', color: 'var(--text-main)' }}>
               Apakah Anda yakin ingin menghapus item ini?
@@ -991,10 +728,10 @@ function DetailInventaris() {
               border: '1px solid var(--border-light)'
             }}>
               <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: 'var(--text-main)' }}>
-                {itemToDelete.hostname || itemToDelete.nama}
+                {itemToDelete.nama}
               </p>
               <p style={{ margin: '0', fontSize: '14px', color: 'var(--text-secondary)' }}>
-                {itemToDelete.jenis} • Lokasi: {itemToDelete.lokasi}
+                Lokasi: {itemToDelete.lokasi}
               </p>
             </div>
             <p style={{ marginTop: '15px', fontSize: '13px', color: 'var(--text-muted)' }}>
@@ -1002,216 +739,6 @@ function DetailInventaris() {
             </p>
           </div>
         )}
-      </Modal>
-
-      {/* Import Modal */}
-      <Modal
-        isOpen={showImportModal}
-        onClose={closeImportModal}
-        title="Import Data Perangkat"
-        size="medium"
-        footer={
-          <>
-            <Button
-              variant="danger"
-              onClick={closeImportModal}
-              disabled={importLoading}
-            >
-              {importResult ? 'Tutup' : 'Batal'}
-            </Button>
-            {!importResult && (
-              <Button
-                variant="success"
-                onClick={handleImportSubmit}
-                disabled={!importFile || importLoading}
-              >
-                {importLoading ? 'Mengimpor...' : 'Import'}
-              </Button>
-            )}
-          </>
-        }
-      >
-        <div className="import-modal-content">
-          {!importResult ? (
-            <>
-              {/* File Upload Section */}
-              <div className="import-section">
-                <label className="import-label">Pilih File (CSV/Excel)</label>
-                <div 
-                  className="import-dropzone"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".csv,.xls,.xlsx"
-                    onChange={handleImportFileChange}
-                    style={{ display: 'none' }}
-                  />
-                  {importFile ? (
-                    <div className="import-file-selected">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span className="import-filename">{importFile.name}</span>
-                      <span className="import-filesize">({(importFile.size / 1024).toFixed(1)} KB)</span>
-                    </div>
-                  ) : (
-                    <div className="import-placeholder">
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <p>Klik untuk memilih file</p>
-                      <span>atau drag & drop file di sini</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Format Info Section */}
-              <div className="import-section">
-                <label className="import-label">Format yang Didukung</label>
-                <div className="import-format-info">
-                  <div className="format-badges">
-                    <Badge variant="info" size="small">CSV</Badge>
-                    <Badge variant="info" size="small">XLS</Badge>
-                    <Badge variant="info" size="small">XLSX</Badge>
-                  </div>
-                  <p className="format-description">
-                    Maksimal ukuran file: <strong>10MB</strong>
-                  </p>
-                </div>
-              </div>
-
-              {/* Column Info Section */}
-              <div className="import-section">
-                <label className="import-label">Kolom yang Diperlukan</label>
-                <div className="import-columns-info">
-                  <table className="import-columns-table">
-                    <thead>
-                      <tr>
-                        <th>Nama Kolom</th>
-                        <th>Wajib</th>
-                        <th>Keterangan</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td><code>jenis_perangkat</code></td>
-                        <td><Badge variant="danger" size="small">Ya</Badge></td>
-                        <td>Jenis perangkat (Router, Switch, dll)</td>
-                      </tr>
-                      <tr>
-                        <td><code>hostname</code></td>
-                        <td><Badge variant="danger" size="small">Ya</Badge></td>
-                        <td>Nama/hostname perangkat</td>
-                      </tr>
-                      <tr>
-                        <td><code>merk_spek</code></td>
-                        <td><Badge variant="secondary" size="small">Tidak</Badge></td>
-                        <td>Merk atau spesifikasi</td>
-                      </tr>
-                      <tr>
-                        <td><code>ip_perangkat</code></td>
-                        <td><Badge variant="secondary" size="small">Tidak</Badge></td>
-                        <td>Alamat IP perangkat</td>
-                      </tr>
-                      <tr>
-                        <td><code>lokasi</code></td>
-                        <td><Badge variant="secondary" size="small">Tidak</Badge></td>
-                        <td>Lokasi detail perangkat</td>
-                      </tr>
-                      <tr>
-                        <td><code>kondisi</code></td>
-                        <td><Badge variant="secondary" size="small">Tidak</Badge></td>
-                        <td>SO atau TSO (default: SO)</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Download Template */}
-              <div className="import-section">
-                <Button
-                  variant="primary"
-                  size="small"
-                  onClick={handleDownloadTemplate}
-                  icon={
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  }
-                >
-                  Download Template Excel
-                </Button>
-              </div>
-
-              {importLoading && (
-                <div className="import-loading">
-                  <div className="import-spinner"></div>
-                  <p>Sedang mengimpor data...</p>
-                </div>
-              )}
-            </>
-          ) : (
-            /* Import Result */
-            <div className="import-result">
-              <div className="import-result-summary">
-                <div className="result-stat success">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  <div>
-                    <span className="result-number">{importResult.success}</span>
-                    <span className="result-label">Berhasil</span>
-                  </div>
-                </div>
-                <div className="result-stat failed">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                    <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                  <div>
-                    <span className="result-number">{importResult.failed}</span>
-                    <span className="result-label">Gagal</span>
-                  </div>
-                </div>
-              </div>
-
-              {importResult.errors && importResult.errors.length > 0 && (
-                <div className="import-errors">
-                  <label className="import-label">Detail Error</label>
-                  <div className="errors-list">
-                    {importResult.errors.map((err, index) => (
-                      <div key={index} className="error-item">
-                        <Badge variant="danger" size="small">Baris {err.row}</Badge>
-                        <span>{err.message}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {importResult.success > 0 && (
-                <div className="import-success-message">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  <span>Data berhasil diimpor dan tabel sudah diperbarui.</span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
       </Modal>
     </div>
   )
