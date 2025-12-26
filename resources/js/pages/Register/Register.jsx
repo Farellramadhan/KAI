@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Input } from '../../components'
+import { Button, Input, Loading, Card } from '../../components'
 import { authAPI } from '../../api'
 import './Register.css'
 
@@ -48,13 +48,11 @@ function Register() {
         password_confirmation: formData.confirmPassword
       })
       
-      alert('Registrasi berhasil! Silakan login.')
       setIsTransitioning(true)
       setTimeout(() => {
-        navigate('/')
+        navigate('/', { replace: true })
       }, 300)
     } catch (err) {
-      console.error('Register error:', err)
       setError(err.message || 'Registrasi gagal. Silakan coba lagi.')
     } finally {
       setLoading(false)
@@ -65,13 +63,17 @@ function Register() {
     e.preventDefault()
     setIsTransitioning(true)
     setTimeout(() => {
-      navigate('/')
+      navigate('/', { replace: true })
     }, 300)
   }
 
   return (
-    <div className={`register-container ${isTransitioning ? 'fade-out' : ''}`}>
-      <div className="image-section">
+    <>
+      {loading ? (
+        <Loading message="Mendaftarkan..." />
+      ) : (
+        <div className={`register-container ${isTransitioning ? 'fade-out' : ''}`}>
+          <div className="image-section">
         <img src="/image/bg-login.png" alt="Train" />
       </div>
       <div className="register-box">
@@ -83,22 +85,21 @@ function Register() {
 
         <form onSubmit={handleSubmit} className="register-form">
           {error && (
-            <div className="error-message" style={{
-              padding: '12px',
-              backgroundColor: '#fee',
-              color: '#c33',
-              borderRadius: '8px',
-              marginBottom: '16px',
-              fontSize: '14px'
-            }}>
-              {error}
-            </div>
+            <Card variant="flat" className="error-message-card">
+              <div className="error-message-content">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                <span>{error}</span>
+              </div>
+            </Card>
           )}
           
           <Input
             type="text"
             label="Nama Lengkap"
-            placeholder="Masukkan nama lengkap"
+            placeholder="Masukkan Nama Lengkap"
             value={formData.nama}
             onChange={(e) => setFormData(prev => ({ ...prev, nama: e.target.value }))}
             required
@@ -130,7 +131,7 @@ function Register() {
           <Input
             type="password"
             label="Password"
-            placeholder="Masukkan password"
+            placeholder="Masukkan Password"
             value={formData.password}
             onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
             minLength={6}
@@ -148,7 +149,7 @@ function Register() {
           <Input
             type="password"
             label="Konfirmasi Password"
-            placeholder="Ulangi password"
+            placeholder="Ulangi Password"
             value={formData.confirmPassword}
             onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
             minLength={6}
@@ -173,10 +174,12 @@ function Register() {
         </form>
 
         <footer className="footer">
-          <p>© 2025 KAI</p>
+          <p>© 2025 KAI DAOP 6</p>
         </footer>
-      </div>
-    </div>
+        </div>
+        </div>
+      )}
+    </>
   )
 }
 

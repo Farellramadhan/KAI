@@ -15,11 +15,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Seed locations first, then assets
+        $this->call([
+            TempatSeeder::class,
+            AssetSeeder::class,
+        ]);
 
-        User::factory()->create([
+        // Create a test user
+        User::create([
             'name' => 'Test User',
-            'email' => 'test@example.com',
+            'email' => 'test@gmail.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
         ]);
     }
 }
