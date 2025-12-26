@@ -13,26 +13,11 @@ export const authAPI = {
 
   // Logout user
   logout: async () => {
-    return await api.post('/logout')
+    return await api.get('/logout')
   },
 
   // Get current authenticated user
   getUser: async () => {
-    return await api.get('/user')
-  },
-
-  // Request password reset code
-  forgotPassword: async (data) => {
-    return await api.post('/forgot-password', data)
-  },
-
-  // Verify reset code
-  verifyResetCode: async (data) => {
-    return await api.post('/verify-reset-code', data)
-  },
-
-  // Reset password with code
-  resetPassword: async (data) => {
-    return await api.post('/reset-password', data)
+    return await api.get('/api/user')
   }
 }

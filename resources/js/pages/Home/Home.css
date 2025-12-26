@@ -1,16 +1,8 @@
 .home-container {
   display: flex;
   height: 100vh;
-  height: 100dvh; /* Dynamic viewport height - follows browser chrome */
   width: 100%;
   background-color: var(--bg-soft);
-  /* Prevent overscroll/bounce on iOS */
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 
 /* Header */
@@ -156,21 +148,6 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* Avatar desktop dengan inisial */
-.profile-avatar-desktop {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark, #1a56db) 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
 .profile-details {
   flex: 1;
   min-width: 0;
@@ -272,7 +249,6 @@
   position: fixed;
   width: 200px;
   height: 100vh;
-  height: 100dvh; /* Dynamic viewport height */
   background: var(--bg);
   display: flex;
   flex-direction: column;
@@ -290,7 +266,6 @@
   display: flex;
   justify-content: center;
   padding: 0;
-  cursor: pointer;
 }
 
 .logo-icon {
@@ -400,48 +375,6 @@
   text-transform: capitalize;
 }
 
-/* Add Location Button in Sidebar */
-.add-location-sidebar-btn {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
-  height: 50px;
-  background: linear-gradient(135deg, var(--success) 0%, #28a745 100%);
-  border: none;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  padding: 0 20px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-}
-
-.add-location-sidebar-btn:hover {
-  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-  transform: translateY(-2px);
-}
-
-.add-location-sidebar-btn:active {
-  transform: translateY(0);
-}
-
-.add-location-sidebar-btn .icon {
-  width: 24px;
-  height: 24px;
-}
-
-.add-location-sidebar-btn span {
-  font-size: 14px;
-  font-weight: 600;
-}
-
 /* Main Content */
 .main-content {
   margin-left: 220px;
@@ -450,7 +383,6 @@
   margin-bottom: 20px;
   width: calc(100% - 240px);
   height: calc(100vh - 110px);
-  height: calc(100dvh - 110px); /* Dynamic viewport height */
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -566,10 +498,6 @@
   background: var(--blue);
 }
 
-.marker-indicator.yellow {
-  background: #ffc107;
-}
-
 .result-info {
   flex: 1;
 }
@@ -592,6 +520,135 @@
   padding: 30px 20px;
   color: var(--text-muted);
   font-size: 14px;
+}
+
+/* Add Location Button */
+.add-location-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 50px;
+  height: 50px;
+  background: var(--success);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.add-location-btn:hover {
+  background: var(--success-dark);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.add-location-btn:active {
+  transform: scale(0.95);
+}
+
+.add-location-btn svg {
+  width: 24px;
+  height: 24px;
+  stroke: white;
+}
+
+/* Map Bottom Controls */
+.map-bottom-controls {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+  z-index: 1000;
+}
+
+.compass-btn {
+  width: 50px;
+  height: 50px;
+  background: var(--bg);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.compass-btn:hover {
+  background: var(--bg-soft);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.compass-btn:active {
+  transform: scale(0.95);
+}
+
+.compass-btn svg {
+  width: 45px;
+  height: 45px;
+  background: var(--bg);
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background: var(--bg-soft);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.compass-btn svg {
+  color: var(--text-main);
+}
+
+/* Zoom Controls */
+.zoom-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.zoom-btn {
+  width: 45px;
+  height: 45px;
+  background: var(--bg);
+  border: none;
+  border-radius: 8px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zoom-btn:hover {
+  background: var(--bg-soft);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.zoom-btn:active {
+  transform: scale(0.95);
 }
 
 /* Leaflet overrides */
@@ -712,14 +769,7 @@
     margin-bottom: 0;
     width: 100%;
     height: 100vh;
-    height: 100dvh; /* Dynamic viewport height - auto adjusts for browser chrome */
-    height: -webkit-fill-available; /* Fallback for older Safari */
     border-radius: 0;
-    /* Safe area insets for notched phones */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
   }
 
   .mobile-search-bar {
@@ -732,11 +782,8 @@
     gap: 12px;
     position: absolute;
     top: 16px;
-    top: calc(16px + env(safe-area-inset-top)); /* Safe area for notched phones */
     left: 16px;
-    left: calc(16px + env(safe-area-inset-left));
     right: 70px;
-    right: calc(70px + env(safe-area-inset-right));
     z-index: 1000;
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
@@ -763,15 +810,13 @@
     color: var(--gray-400);
   }
 
-.profile-menu-wrapper-mobile {
-  position: absolute;
-  top: 16px;
-  top: calc(16px + env(safe-area-inset-top)); /* Safe area for notched phones */
-  right: 16px;
-  right: calc(16px + env(safe-area-inset-right));
-  z-index: 1000;
-  display: block;
-}
+  .profile-menu-wrapper-mobile {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 2001;
+    display: block;
+  }
 
   .profile-mobile-btn-map {
     width: 48px;
@@ -787,14 +832,6 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
     color: var(--gray-600);
     cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    position: relative;
-    z-index: 1001;
   }
 
   .profile-mobile-btn-map:active {
@@ -803,73 +840,17 @@
 
   .profile-dropdown-map {
     position: absolute;
-    top: 56px;
+    top: 110px;
     right: 0;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    min-width: 200px;
-    width: auto;
-    z-index: 5000;
-    animation: slideDownFade 0.2s ease-out;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    min-width: 280px;
+    z-index: 3000;
+    animation: slideDownFade 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
-    padding: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-  }
-
-  /* Profile header mobile dengan avatar */
-  .profile-header-mobile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
-    margin-bottom: 6px;
-    border-bottom: 1px solid var(--border-light);
-  }
-
-  .profile-avatar-mobile {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark, #1a56db) 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  .profile-text-mobile {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .profile-text-mobile .profile-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-900);
-    margin: 0 0 1px 0;
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .profile-text-mobile .profile-email {
-    font-size: 11px;
-    color: var(--gray-500);
-    margin: 0;
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .profile-dropdown-map .logout-btn {
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
   }
 
   @keyframes slideDownFade {
@@ -1002,7 +983,7 @@
     left: 16px;
     right: 16px;
     gap: 8px;
-    z-index: 999;
+    z-index: 1000;
     overflow-x: auto;
     padding-bottom: 8px;
   }
@@ -1039,88 +1020,53 @@
     background: var(--blue-dark);
   }
 
-  .filter-bubble.add-mobile {
-    background: linear-gradient(135deg, var(--success) 0%, #28a745 100%);
-    color: white;
-    border-color: var(--success);
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
-  }
-
-  .filter-bubble.add-mobile:hover {
-    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-  }
-
   .search-panel {
     display: none;
   }
 
-  .add-location-sidebar-btn {
-    display: none;
+  .zoom-controls {
+    bottom: 20px;
   }
 
-  /* Mobile Floating Add Button */
-  .mobile-add-btn {
-    display: flex;
-    position: absolute;
+  .map-bottom-controls {
     bottom: 20px;
-    bottom: calc(20px + env(safe-area-inset-bottom)); /* Safe area for notched phones */
-    left: 16px;
-    left: calc(16px + env(safe-area-inset-left));
-    width: 56px;
-    height: 40px;
-    background: var(--success);
-    border-radius: 10%;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: white;
-    z-index: 1000;
-}
-}
+    right: 16px;
+  }
 
-/* Hide mobile add button on desktop */
-@media (min-width: 769px) {
-  .mobile-add-btn {
-    display: none;
+  .add-location-btn {
+    top: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .add-location-btn svg {
+    width: 22px;
+    height: 22px;
   }
 }
 
 @media (max-width: 480px) {
+  .zoom-controls {
+    bottom: 20px;
+  }
+
   .search-panel {
     width: calc(100% - 24px);
     left: 12px;
     right: 12px;
     top: 65px;
-    top: calc(65px + env(safe-area-inset-top)); /* Safe area for notched phones */
   }
 
-  .mobile-add-btn {
-    bottom: 20px;
-    bottom: calc(20px + env(safe-area-inset-bottom));
-    left: 12px;
-    left: calc(12px + env(safe-area-inset-left));
-    width: 50px;
-    height: 50px;
-  }
-}
-
-/* Leaflet Zoom Control - Safe Area Adjustments for Mobile */
-@media (max-width: 768px) {
-  .leaflet-control-zoom {
-    margin-bottom: 20px !important;
-    margin-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
-    margin-right: 16px !important;
-    margin-right: calc(16px + env(safe-area-inset-right)) !important;
+  .add-location-btn {
+    top: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
   }
 
-  .leaflet-bottom.leaflet-right {
-    bottom: env(safe-area-inset-bottom);
-    right: env(safe-area-inset-right);
-  }
-
-  /* Attribution - Safe area */
-  .leaflet-control-attribution {
-    margin-bottom: env(safe-area-inset-bottom) !important;
+  .add-location-btn svg {
+    width: 20px;
+    height: 20px;
   }
 }

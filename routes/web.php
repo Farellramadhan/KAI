@@ -1,17 +1,34 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-
-// Main SPA route
 Route::get('/', function () {
     return view('app');
 })->name('login');
 
-// SPA catch-all routes (React Router handles the rest)
-Route::get('/{any}', function () {
+Route::get('/register', function () {
     return view('app');
-})->where('any', '.*');
+});
+
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/home', function () { 
+    return view('app'); 
+});
+
+Route::get('/dashboard', function () { return view('app'); })
+    ->middleware('auth')
+    ->name('dashboard');
+Route::get('/akun', function () { return view('app'); })
+    ->middleware('auth')
+    ->name('profile');
+
+Route::get('/tes',function(){
+    return view('test');
+});
 
 

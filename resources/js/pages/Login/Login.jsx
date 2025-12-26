@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { Button, Input, Loading, Card } from '../../components'
+import { useNavigate } from 'react-router-dom'
+import { Button, Input } from '../../components'
 import { authAPI } from '../../api'
 import './Login.css'
 
@@ -31,8 +31,9 @@ function Login({ onLogin }) {
       }
       
       onLogin(userData)
-      navigate('/home', { replace: true })
+      navigate('/home')
     } catch (err) {
+      console.error('Login error:', err)
       setError(err.message || 'Email atau password salah. Silakan coba lagi.')
     } finally {
       setLoading(false)
@@ -43,25 +44,13 @@ function Login({ onLogin }) {
     e.preventDefault()
     setIsTransitioning(true)
     setTimeout(() => {
-      navigate('/register', { replace: true })
-    }, 300)
-  }
-
-  const handleNavigateToForgotPassword = (e) => {
-    e.preventDefault()
-    setIsTransitioning(true)
-    setTimeout(() => {
-      navigate('/forgot-password', { replace: true })
+      navigate('/register')
     }, 300)
   }
 
   return (
-    <>
-      {loading ? (
-        <Loading message="Login..." />
-      ) : (
-        <div className={`login-container ${isTransitioning ? 'fade-out' : ''}`}>
-          <div className="login-box">
+    <div className={`login-container ${isTransitioning ? 'fade-out' : ''}`}>
+      <div className="login-box">
         <div className="logo-section">
           <div className="logo">
             <img src="/image/logo.png" alt="Train Logo" />
@@ -70,15 +59,16 @@ function Login({ onLogin }) {
 
         <form onSubmit={handleSubmit} className="login-form">
           {error && (
-            <Card variant="flat" className="error-message-card">
-              <div className="error-message-content">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-                <span>{error}</span>
-              </div>
-            </Card>
+            <div className="error-message" style={{
+              padding: '12px',
+              backgroundColor: '#fee',
+              color: '#c33',
+              borderRadius: '8px',
+              marginBottom: '16px',
+              fontSize: '14px'
+            }}>
+              {error}
+            </div>
           )}
 
           <Input
@@ -100,7 +90,7 @@ function Login({ onLogin }) {
           <Input
             type="password"
             label="Password"
-            placeholder="Masukkan Password"
+            placeholder="Masukkan password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -114,7 +104,7 @@ function Login({ onLogin }) {
           />
 
           <div className="forgot-password">
-            <a href="/forgot-password" onClick={handleNavigateToForgotPassword}>Lupa Password?</a>
+            <a href="#forgot">Lupa Password?</a>
           </div>
 
           <Button type="submit" variant="primary" size="large" fullWidth disabled={loading}>
@@ -127,16 +117,14 @@ function Login({ onLogin }) {
         </form>
 
         <footer className="footer">
-          <p>© 2025 KAI DAOP 6</p>
+          <p>© 2025 KAI</p>
         </footer>
       </div>
 
       <div className="image-section">
         <img src="/image/bg-login.png" alt="Train" />
       </div>
-        </div>
-      )}
-    </>
+    </div>
   )
 }
 

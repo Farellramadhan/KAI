@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { useNavigate } from 'react-router-dom'
-import { Button, Modal, Input, Loading, MapPicker, Badge, Card } from '../../components'
-import { useToast } from '../../components/Toast'
+import { Button, Modal, Input } from '../../components'
 import { locationsAPI } from '../../api'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -44,37 +43,24 @@ const blueIcon = new L.Icon({
   shadowSize: [41, 41]
 })
 
-const yellowIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-})
-
 function Home({ user, onLogout }) {
   const navigate = useNavigate()
-  const toast = useToast()
   const [menuOpen, setMenuOpen] = useState(false)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [showMobileList, setShowMobileList] = useState(false)
-  const [showLocationModal, setShowLocationModal] = useState(false)
+  const [showAddLocationModal, setShowAddLocationModal] = useState(false)
   const [locations, setLocations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [showSuccessLoading, setShowSuccessLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     latitude: '',
     longitude: '',
     category: 'stasiun',
-    code: '',
-    image: null,
-    imagePreview: null
+    code: ''
   })
   const mapRef = useRef(null)
   const markerRefs = useRef({})
@@ -101,7 +87,8 @@ function Home({ user, onLogout }) {
         setLocations(transformedLocations)
         setError(null)
       } catch (err) {
-        setError('Gagal Memuat Data Lokasi. Silakan Refresh Halaman.')
+        console.error('Error fetching locations:', err)
+        setError('Gagal memuat data lokasi. Silakan refresh halaman.')
       } finally {
         setLoading(false)
       }
@@ -115,7 +102,7 @@ function Home({ user, onLogout }) {
     const types = {
       stasiun: 'green',
       kantor: 'red',
-      gudang: 'yellow',
+      gudang: 'red',
       pjl: 'blue'
     }
     return types[category] || 'green'
@@ -186,29 +173,18 @@ function Home({ user, onLogout }) {
     } else {
       setActiveCategory(category)
     }
+  }
 
-    // Navigate map to show locations of this category
-    if (mapRef.current && locations.length > 0) {
-      const categoryLocations = category === 'all' 
-        ? locations 
-        : locations.filter(loc => loc.category === category)
-
-      if (categoryLocations.length > 0) {
-        // Calculate bounds for all locations in this category
-        const bounds = L.latLngBounds(
-          categoryLocations.map(loc => [loc.position[0], loc.position[1]])
-        )
-
-        // Fit map to bounds with some padding
-        mapRef.current.fitBounds(bounds, { 
-          padding: [20, 20],
-          maxZoom: 15 // Don't zoom in too much
-        })
-      }
+  const handleZoomIn = () => {
+    if (mapRef.current) {
+      mapRef.current.zoomIn()
     }
+  }
 
-    // Close mobile search results list
-    setShowMobileList(false)
+  const handleZoomOut = () => {
+    if (mapRef.current) {
+      mapRef.current.zoomOut()
+    }
   }
 
   // Get automatic code based on category
@@ -224,25 +200,21 @@ function Home({ user, onLogout }) {
 
   const handleAddLocation = async () => {
     if (!formData.name || !formData.latitude || !formData.longitude) {
-      toast.warning('Silakan isi semua field yang wajib!')
+      alert('Silakan isi semua field yang wajib!')
       return
     }
 
     try {
-      // Use FormData for file upload support
-      const locationFormData = new FormData()
-      locationFormData.append('name', formData.name)
-      locationFormData.append('latitude', parseFloat(formData.latitude))
-      locationFormData.append('longitude', parseFloat(formData.longitude))
-      locationFormData.append('category', formData.category)
-      locationFormData.append('code', formData.code || getCodeFromCategory(formData.category))
-      locationFormData.append('description', 'Lokasi baru')
-      
-      if (formData.image) {
-        locationFormData.append('image', formData.image)
+      const locationData = {
+        name: formData.name,
+        latitude: parseFloat(formData.latitude),
+        longitude: parseFloat(formData.longitude),
+        category: formData.category,
+        code: formData.code || getCodeFromCategory(formData.category),
+        description: 'Lokasi baru'
       }
 
-      const newLocation = await locationsAPI.create(locationFormData)
+      const newLocation = await locationsAPI.create(locationData)
       
       // Transform and add to local state
       const transformedLocation = {
@@ -264,16 +236,13 @@ function Home({ user, onLogout }) {
         latitude: '',
         longitude: '',
         category: 'stasiun',
-        code: '',
-        image: null,
-        imagePreview: null
+        code: ''
       })
-      setShowLocationModal(false)
-      
-      // Show success loading screen
-      setShowSuccessLoading(true)
+      setShowAddLocationModal(false)
+      alert('Lokasi berhasil ditambahkan!')
     } catch (err) {
-      toast.error('Gagal menambahkan lokasi: ' + err.message)
+      console.error('Error adding location:', err)
+      alert('Gagal menambahkan lokasi: ' + err.message)
     }
   }
 
@@ -293,38 +262,6 @@ function Home({ user, onLogout }) {
     }
   }
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        toast.warning('Silakan pilih file gambar!')
-        return
-      }
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.warning('Ukuran gambar maksimal 5MB!')
-        return
-      }
-      setFormData(prev => ({
-        ...prev,
-        image: file,
-        imagePreview: URL.createObjectURL(file)
-      }))
-    }
-  }
-
-  const removeImage = () => {
-    if (formData.imagePreview) {
-      URL.revokeObjectURL(formData.imagePreview)
-    }
-    setFormData(prev => ({
-      ...prev,
-      image: null,
-      imagePreview: null
-    }))
-  }
-
   const MapController = () => {
     const map = useMap()
     mapRef.current = map
@@ -332,53 +269,38 @@ function Home({ user, onLogout }) {
   }
 
   return (
-    <>
-      {loading ? (
-        <Loading message="Memuat Lokasi..." />
-      ) : (
-        <div className="home-container">
-          {/* Header */}
-          <header className="header">
+    <div className="home-container">
+      {/* Header */}
+      <header className="header">
         <div className="header-left">
           <h1 className="welcome-text">Selamat Datang {welcomeName}!</h1>
         </div>
         <div className="header-right">
-          <Button 
-            variant="ghost" 
-            className="user-button" 
-            onClick={() => setMenuOpen(!menuOpen)}
-            icon={
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            }
-          />
+          <button className="user-button" onClick={() => setMenuOpen(!menuOpen)}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
           {menuOpen && (
             <div className="dropdown-menu">
               <div className="profile-info">
-                <div className="profile-avatar-desktop">
-                  {welcomeName.charAt(0).toUpperCase()}
+                <div className="profile-avatar">
+                  <img width="32" height="32" src="/image/avatar.jpg" alt="User Avatar" />
                 </div>
                 <div className="profile-details">
                   <p className="profile-name">{welcomeName}</p>
                   <p className="profile-email">{user?.email || 'user@kai.id'}</p>
                 </div>
               </div>
-              <Button 
-                variant="danger" 
-                className="logout-btn" 
-                onClick={onLogout}
-                icon={
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                }
-              >
-                Keluar
-              </Button>
+              <button className="logout-btn" onClick={onLogout}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Logout
+              </button>
             </div>
           )}
         </div>
@@ -386,7 +308,7 @@ function Home({ user, onLogout }) {
 
       {/* Sidebar */}
       <aside className="sidebar">
-        <div className="logo-container" onClick={() => window.location.reload()}>
+        <div className="logo-container">
           <img src="/image/logo.png" alt="KAI Logo" className="logo-icon" />
         </div>
 
@@ -452,21 +374,6 @@ function Home({ user, onLogout }) {
             <span>PJL</span>
           </button>
         </nav>
-
-        {/* Add Location Button in Sidebar */}
-        <Button 
-          variant="success"
-          className="add-location-sidebar-btn"
-          onClick={() => setShowLocationModal(true)}
-          title="Tambah Lokasi Baru"
-          icon={
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          }
-        >
-          <span>Tambah Lokasi</span>
-        </Button>
       </aside>
 
       {/* Map Content */}
@@ -479,7 +386,7 @@ function Home({ user, onLogout }) {
           </svg>
           <input
             type="text"
-            placeholder="Cari Lokasi..."
+            placeholder="Cari lokasi..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="mobile-search-input"
@@ -496,29 +403,23 @@ function Home({ user, onLogout }) {
           </button>
           {profileMenuOpen && (
             <div className="profile-dropdown-map">
-              <div className="profile-header-mobile">
-                <div className="profile-avatar-mobile">
-                  {welcomeName.charAt(0).toUpperCase()}
+              <div className="profile-info">
+                <div className="profile-avatar">
+                  <img width="48" height="48" src="/image/avatar.jpg" alt="User Avatar" />
                 </div>
-                <div className="profile-text-mobile">
+                <div className="profile-details">
                   <p className="profile-name">{welcomeName}</p>
                   <p className="profile-email">{user?.email || 'user@kai.id'}</p>
                 </div>
               </div>
-              <Button 
-                variant="danger" 
-                className="logout-btn" 
-                onClick={onLogout}
-                icon={
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                }
-              >
-                Keluar
-              </Button>
+              <button className="logout-btn" onClick={onLogout}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Logout
+              </button>
             </div>
           )}
         </div>
@@ -596,19 +497,6 @@ function Home({ user, onLogout }) {
           </button>
         </div>
 
-        {/* Mobile Floating Add Button */}
-        <Button 
-          variant="success"
-          className="mobile-add-btn"
-          onClick={() => setShowLocationModal(true)}
-          title="Tambah Lokasi Baru"
-          icon={
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          }
-        />
-
         {/* Search Panel */}
         {searchOpen && (
           <>
@@ -630,7 +518,7 @@ function Home({ user, onLogout }) {
               <div className="search-panel-header">
                 <input
                   type="text"
-                  placeholder="Cari Lokasi..."
+                  placeholder="Cari lokasi..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="search-input"
@@ -676,7 +564,6 @@ function Home({ user, onLogout }) {
           ref={mapRef}
         >
           <MapController />
-          <ZoomControl position="bottomright" />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -685,7 +572,7 @@ function Home({ user, onLogout }) {
             <Marker 
               key={location.id} 
               position={location.position}
-              icon={location.type === 'green' ? greenIcon : location.type === 'red' ? redIcon : location.type === 'yellow' ? yellowIcon : blueIcon}
+              icon={location.type === 'green' ? greenIcon : location.type === 'red' ? redIcon : blueIcon}
               ref={(ref) => {
                 if (ref) {
                   markerRefs.current[location.id] = ref
@@ -715,57 +602,42 @@ function Home({ user, onLogout }) {
             </Marker>
           ))}
         </MapContainer>
+
+        {/* Add Location Button */}
+        <button 
+          className="add-location-btn"
+          onClick={() => setShowAddLocationModal(true)}
+          title="Tambah Lokasi"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+
+        <div className="map-bottom-controls">
+          <div className="zoom-controls">
+            <button className="zoom-btn" onClick={handleZoomIn} title="Zoom In">+</button>
+            <button className="zoom-btn" onClick={handleZoomOut} title="Zoom Out">−</button>
+          </div>
+        </div>
       </main>
 
-{/* Modal Tambah Lokasi */}
+      {/* Modal Tambah Lokasi */}
       <Modal
-        isOpen={showLocationModal}
-        onClose={() => {
-          setShowLocationModal(false)
-          if (formData.imagePreview) {
-            URL.revokeObjectURL(formData.imagePreview)
-          }
-          setFormData({
-            name: '',
-            latitude: '',
-            longitude: '',
-            category: 'stasiun',
-            code: '',
-            image: null,
-            imagePreview: null
-          })
-        }}
+        isOpen={showAddLocationModal}
+        onClose={() => setShowAddLocationModal(false)}
         title="Tambah Lokasi Baru"
         size="medium"
         footer={
           <>
             <Button
-              variant="danger"
-              onClick={() => {
-                setShowLocationModal(false)
-                if (formData.imagePreview) {
-                  URL.revokeObjectURL(formData.imagePreview)
-                }
-                setFormData({
-                  name: '',
-                  latitude: '',
-                  longitude: '',
-                  category: 'stasiun',
-                  code: '',
-                  image: null,
-                  imagePreview: null
-                })
-              }}
+              variant="ghost"
+              onClick={() => setShowAddLocationModal(false)}
             >
               Batal
             </Button>
             <Button
               variant="success"
-              icon={
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              }
               onClick={handleAddLocation}
             >
               Tambah Lokasi
@@ -783,85 +655,27 @@ function Home({ user, onLogout }) {
             onChange={handleFormChange}
           />
 
-          {/* Image Upload */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>Gambar Lokasi</label>
-            {formData.imagePreview ? (
-              <div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-light)' }}>
-                <img 
-                  src={formData.imagePreview} 
-                  alt="Preview" 
-                  style={{ width: '100%', height: '150px', objectFit: 'cover' }}
-                />
-                <button
-                  onClick={removeImage}
-                  style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '8px',
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    background: 'rgba(0,0,0,0.6)',
-                    border: 'none',
-                    color: 'white',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </button>
-              </div>
-            ) : (
-              <label 
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '10px',
-                  padding: '30px 20px',
-                  border: '2px dashed var(--border-light)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  background: 'var(--bg-soft)',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--text-secondary)' }}>
-                  <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                  <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
-                  <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Klik untuk upload gambar</span>
-                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>PNG, JPG, JPEG (Max 5MB)</span>
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  style={{ display: 'none' }}
-                />
-              </label>
-            )}
+          {/* Koordinat */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <Input
+              label="Latitude"
+              placeholder="-7.795"
+              name="latitude"
+              type="number"
+              step="0.000001"
+              value={formData.latitude}
+              onChange={handleFormChange}
+            />
+            <Input
+              label="Longitude"
+              placeholder="110.369"
+              name="longitude"
+              type="number"
+              step="0.000001"
+              value={formData.longitude}
+              onChange={handleFormChange}
+            />
           </div>
-
-          {/* Map Picker for Location Selection */}
-          <MapPicker
-            latitude={formData.latitude}
-            longitude={formData.longitude}
-            category={formData.category}
-            onLocationChange={(lat, lng) => {
-              setFormData(prev => ({
-                ...prev,
-                latitude: lat,
-                longitude: lng
-              }))
-            }}
-          />
 
           {/* Kategori */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -882,7 +696,7 @@ function Home({ user, onLogout }) {
 
             {/* Kode Marker */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>Kode Marker</label>
+              <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>Kode Marker (Bisa Diedit)</label>
               <Input
                 placeholder="STN"
                 name="code"
@@ -894,19 +708,9 @@ function Home({ user, onLogout }) {
           </div>
         </div>
       </Modal>
-
-      {/* Success Loading Screen */}
-      {showSuccessLoading && (
-        <Loading 
-          message="Berhasil menambah lokasi" 
-          onComplete={() => setShowSuccessLoading(false)} 
-        />
-      )}
-
-        </div>
-      )}
-    </>
+    </div>
   )
 }
 
 export default Home
+
