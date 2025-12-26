@@ -1,0 +1,125 @@
+/* Badge Component Styles */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--radius-full, 9999px);
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* Sizes */
+.badge-small {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.badge-medium {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.badge-large {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+/* Variants */
+.badge-primary {
+  background: rgba(45, 43, 112, 0.1);
+  color: var(--primary, #2D2B70);
+}
+
+.badge-secondary {
+  background: rgba(242, 105, 36, 0.1);
+  color: var(--secondary, #F26924);
+}
+
+.badge-success {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--success, #28a745);
+}
+
+.badge-danger {
+  background: rgba(255, 40, 0, 0.1);
+  color: var(--danger, #FF2800);
+}
+
+.badge-warning {
+  background: rgba(255, 193, 7, 0.1);
+  color: #f59e0b;
+}
+
+.badge-info {
+  background: rgba(23, 162, 184, 0.1);
+  color: #0ea5e9;
+}
+
+.badge-gray {
+  background: var(--gray-100, #f3f4f6);
+  color: var(--gray-700, #374151);
+}
+
+/* With Dot */
+.badge-dot {
+  padding-left: 8px;
+}
+
+.badge-dot-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.badge-primary .badge-dot-indicator {
+  background: var(--primary, #2D2B70);
+}
+
+.badge-secondary .badge-dot-indicator {
+  background: var(--secondary, #F26924);
+}
+
+.badge-success .badge-dot-indicator {
+  background: var(--success, #28a745);
+}
+
+.badge-danger .badge-dot-indicator {
+  background: var(--danger, #FF2800);
+}
+
+.badge-warning .badge-dot-indicator {
+  background: #f59e0b;
+}
+
+.badge-info .badge-dot-indicator {
+  background: #0ea5e9;
+}
+
+.badge-gray .badge-dot-indicator {
+  background: var(--gray-500, #6b7280);
+}
+
+/* With Icon */
+.badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-icon svg {
+  width: 12px;
+  height: 12px;
+}
+
+.badge-small .badge-icon svg {
+  width: 10px;
+  height: 10px;
+}
+
+.badge-large .badge-icon svg {
+  width: 14px;
+  height: 14px;
+}

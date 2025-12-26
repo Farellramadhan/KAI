@@ -1,0 +1,164 @@
+.login-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  background: var(--bg-soft);
+  padding: 20px;
+  gap: 20px;
+  transition: opacity 0.3s ease;
+}
+
+.login-container.fade-out {
+  opacity: 0;
+}
+
+/* Left side - Login Form */
+.login-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 40px;
+  background: var(--bg);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-section {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.logo {
+  width: 140px;
+  height: 65px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-top: -8px;
+  margin-bottom: 8px;
+}
+
+.forgot-password a {
+  font-size: 13px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.forgot-password a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.register-link p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.register-link a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.register-link a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.footer {
+  margin-top: 40px;
+}
+
+.footer p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Right side - Train Image */
+.image-section {
+  flex: 1;
+  background: var(--bg);
+  background-image: url('/image/bg-login.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.image-section img {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+  .login-container {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .image-section {
+    display: none;
+  }
+
+  .login-box {
+    flex: 1;
+    width: 100%;
+    padding: 40px 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 0;
+  }
+
+  .login-box {
+    padding: 30px 20px;
+    border-radius: 0;
+  }
+
+  .login-form {
+    max-width: 100%;
+  }
+
+  .logo {
+    width: 120px;
+    height: 55px;
+  }
+}
