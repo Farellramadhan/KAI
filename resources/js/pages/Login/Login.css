@@ -53,6 +53,30 @@
   gap: 20px;
 }
 
+/* Error Message Card */
+.error-message-card {
+  background: #fee2e2 !important;
+  border: 1px solid #fca5a5 !important;
+  border-radius: 8px !important;
+  margin-bottom: 8px;
+}
+
+.error-message-card .card-body {
+  padding: 12px !important;
+}
+
+.error-message-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.error-message-content svg {
+  flex-shrink: 0;
+}
+
 .forgot-password {
   text-align: right;
   margin-top: -8px;
