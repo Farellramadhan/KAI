@@ -4,6 +4,7 @@ import { Button, Input, Loading, Card } from '../../components'
 import { authAPI } from '../../api'
 import './Register.css'
 
+// Register component for user registration
 function Register() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
