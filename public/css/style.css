@@ -1,0 +1,29 @@
+body {
+    background-color: #f5f7fa;
+}
+.nav-link.active {
+    background: #ff7f00 !important;
+    color: #fff !important;
+    border-radius: 8px;
+}
+.card-icon {
+    font-size: 32px;
+    color: #ff7f00;
+}
+.header-bg {
+    background: linear-gradient(135deg, #ff7f00, #ffb86c);
+    color: #fff;
+    padding: 30px 20px;
+    border-radius: 0 0 20px 20px;
+}
+.card-profile {
+    border-radius: 20px;
+}
+.btn-logout {
+    background: #ff7f00;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 12px;
+}

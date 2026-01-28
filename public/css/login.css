@@ -1,0 +1,137 @@
+body {
+    background: linear-gradient(135deg, #007bff, #ff6600);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Poppins", sans-serif;
+}
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    50% {
+        transform: translateX(5px);
+    }
+    75% {
+        transform: translateX(-5px);
+    }
+}
+
+input.error {
+    border-color: red !important;
+    animation: shake 0.2s ease-in-out 2;
+}
+
+.text-danger {
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: block;
+}
+
+input:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 4px rgba(220, 53, 69, 0.4) !important;
+}
+
+.card {
+    width: 420px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.forms {
+    display: flex;
+    width: 200%;
+    transition: transform 0.6s ease;
+}
+
+.card.active .forms {
+    transform: translateX(-50%);
+}
+
+form {
+    width: 50%;
+    padding: 40px 30px;
+    transition: 0.4s;
+}
+#loginError {
+    display: flex;
+    justify-content: center; /* posisi horizontal tengah */
+    align-items: center; /* posisi vertikal tengah */
+    text-align: center; /* kalau teks lebih dari 1 baris */
+    font-size: larger;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.btn-custom {
+    background-color: #ff6600;
+    border: none;
+    transition: 0.3s;
+}
+
+.btn-custom:hover {
+    background-color: #e65c00;
+}
+
+.toggle {
+    text-align: center;
+    margin-top: 15px;
+    color: #007bff;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.toggle:hover {
+    text-decoration: underline;
+}
+
+.logo {
+    display: block;
+    margin: 0 auto 15px;
+    width: 90px;
+}
+
+/* Password strength indicator */
+.strength {
+    height: 6px;
+    border-radius: 5px;
+    margin-top: 5px;
+    transition: 0.3s;
+}
+
+.strength.weak {
+    width: 33%;
+    background-color: red;
+}
+
+.strength.medium {
+    width: 66%;
+    background-color: orange;
+}
+
+.strength.strong {
+    width: 100%;
+    background-color: green;
+}
+
+.strength-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-top: 5px;
+    text-align: right;
+}

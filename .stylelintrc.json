@@ -1,0 +1,9 @@
+{
+  "extends": "stylelint-config-recommended",
+  "rules": {
+    "property-no-vendor-prefix": null,
+    "declaration-property-unit-allowed-list": null,
+    "property-unknown": null,
+    "declaration-no-important": null
+  }
+}

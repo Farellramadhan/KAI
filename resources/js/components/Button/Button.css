@@ -1,0 +1,145 @@
+/* Button Component Styles */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+  user-select: none;
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 43, 112, 0.1);
+}
+
+/* Sizes */
+.btn-small {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: var(--radius-sm, 6px);
+}
+
+.btn-medium {
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.btn-large {
+  padding: 14px 28px;
+  font-size: 16px;
+  border-radius: var(--radius-lg, 10px);
+}
+
+/* Variants */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary, #2D2B70) 0%, #1a1850 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1a1850 0%, var(--primary, #2D2B70) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(45, 43, 112, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--secondary, #F26924) 0%, #d45a1f 100%);
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d45a1f 0%, var(--secondary, #F26924) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(242, 105, 36, 0.3);
+}
+
+.btn-danger {
+  background: var(--danger, #FF2800);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #cc2000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 40, 0, 0.3);
+}
+
+.btn-success {
+  background: var(--success, #28a745);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--primary, #2D2B70);
+  color: var(--primary, #2D2B70);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--primary, #2D2B70);
+  color: white;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--gray-700, #374151);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--gray-100, #f3f4f6);
+}
+
+/* States */
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-disabled,
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Full Width */
+.btn-full-width {
+  width: 100%;
+}
+
+/* Icon */
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-small .btn-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-large .btn-icon svg {
+  width: 20px;
+  height: 20px;
+}
