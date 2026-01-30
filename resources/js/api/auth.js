@@ -3,12 +3,12 @@ import { api } from './client'
 export const authAPI = {
   // Login user
   login: async (credentials) => {
-    return await api.post('/login', credentials)
+    return await api.post('/api/login', credentials)
   },
 
   // Register new user
   register: async (userData) => {
-    return await api.post('/register', userData)
+    return await api.post('/api/register', userData)
   },
 
   // Logout user
