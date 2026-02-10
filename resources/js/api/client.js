@@ -1,5 +1,18 @@
 // API Client Configuration
-const API_BASE_URL = window.location.origin
+// Use relative URLs in development to leverage Vite proxy
+// In production, use the API base URL from meta tag
+const META_API_BASE =
+  document.querySelector('meta[name="api-base-url"]')?.getAttribute('content')
+
+// In development (Vite), use empty string to use current origin (proxy will handle it)
+// In production, use the configured API base URL
+const API_ORIGIN = import.meta.env.DEV 
+  ? '' 
+  : (META_API_BASE && META_API_BASE.replace(/\/$/, '')) || ''
+
+const API_BASE_URL = `${API_ORIGIN}/api`
+
+export { API_BASE_URL }
 
 // Helper untuk mendapatkan CSRF token dari meta tag
 const getCsrfToken = () => {
@@ -14,8 +27,12 @@ export const apiClient = async (endpoint, options = {}) => {
   const defaultHeaders = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'X-CSRF-TOKEN': getCsrfToken(),
     'X-Requested-With': 'XMLHttpRequest'
+  }
+
+  // Add CSRF token only for non-API routes
+  if (!url.includes('/api')) {
+    defaultHeaders['X-CSRF-TOKEN'] = getCsrfToken()
   }
 
   const config = {
@@ -24,7 +41,7 @@ export const apiClient = async (endpoint, options = {}) => {
       ...defaultHeaders,
       ...options.headers
     },
-    credentials: 'same-origin' // Important untuk session cookies
+    credentials: 'include' // Important untuk session cookies
   }
 
   try {
@@ -44,6 +61,11 @@ export const apiClient = async (endpoint, options = {}) => {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}))
+      // For validation errors, include field errors
+      if (error.errors) {
+        const errorMessages = Object.values(error.errors).flat().join(', ')
+        throw new Error(`${error.message}: ${errorMessages}`)
+      }
       throw new Error(error.message || `HTTP Error: ${response.status}`)
     }
 
@@ -54,7 +76,49 @@ export const apiClient = async (endpoint, options = {}) => {
 
     return await response.json()
   } catch (error) {
-    console.error('API Error:', error)
+    throw error
+  }
+}
+
+// Helper untuk request dengan FormData (file upload)
+export const apiFormData = async (endpoint, method, formData) => {
+  const url = `${API_BASE_URL}${endpoint}`
+  
+  try {
+    const response = await fetch(url, {
+      method,
+      body: formData,
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    
+    if (response.status === 401) {
+      window.location.href = '/login'
+      throw new Error('Unauthorized')
+    }
+
+    if (response.status === 419) {
+      throw new Error('Session expired. Please refresh the page.')
+    }
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}))
+      if (error.errors) {
+        const errorMessages = Object.values(error.errors).flat().join(', ')
+        throw new Error(`${error.message}: ${errorMessages}`)
+      }
+      throw new Error(error.message || `HTTP Error: ${response.status}`)
+    }
+
+    if (response.status === 204) {
+      return null
+    }
+
+    return await response.json()
+  } catch (error) {
     throw error
   }
 }
@@ -64,19 +128,30 @@ export const api = {
   get: (endpoint, options = {}) => 
     apiClient(endpoint, { ...options, method: 'GET' }),
   
-  post: (endpoint, data, options = {}) => 
-    apiClient(endpoint, {
+  post: (endpoint, data, options = {}) => {
+    // Support FormData for file uploads
+    if (data instanceof FormData) {
+      return apiFormData(endpoint, 'POST', data)
+    }
+    return apiClient(endpoint, {
       ...options,
       method: 'POST',
       body: JSON.stringify(data)
-    }),
+    })
+  },
   
-  put: (endpoint, data, options = {}) => 
-    apiClient(endpoint, {
+  put: (endpoint, data, options = {}) => {
+    // Support FormData for file uploads (use POST with _method override)
+    if (data instanceof FormData) {
+      data.append('_method', 'PUT')
+      return apiFormData(endpoint, 'POST', data)
+    }
+    return apiClient(endpoint, {
       ...options,
       method: 'PUT',
       body: JSON.stringify(data)
-    }),
+    })
+  },
   
   patch: (endpoint, data, options = {}) => 
     apiClient(endpoint, {
